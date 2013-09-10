@@ -1,0 +1,47 @@
+.container_24{margin-top: 10px;}
+
+.banner{background: url(../img/muncher.jpg) no-repeat; width: 695px; height: 231px; position: relative;}
+
+#lineone{font-size: 28px; color: white; width: 310px; font-weight: normal; position: absolute; bottom: 150px; left: 8px; background:rgba(0,0,0,.5); padding-top: 0; padding-bottom: 0;}
+#linetwo{font-size: 28px; color: white; width: 230px; font-weight: normal; position: absolute; bottom: 80px; left: 8px; background:rgba(0,0,0,.5); padding-top: 0; padding-bottom: 0;}
+#linethree{font-size: 28px; color: white; width: 330px; font-weight: normal; position: absolute; bottom: 10px; left: 8px; background:rgba(0,0,0,.5); padding-top: 0; padding-bottom: 0;}
+
+header h1{margin:10px 10px 10px; display:inline-block; font-family: 'Give You Glory', cursive; font-size: 37px;}
+
+
+
+nav{float: right; padding-top: 10px; margin-top: 19px;}
+header{overflow: hidden;}
+nav li{display: inline; margin-left: 24px;}
+
+a{color: #7e7e7e; text-decoration: none; transition: background 0.3s linear 0s, color 0.3s linear 0s;}
+a:hover, .selected{color: black;}
+
+nav{padding-top: 0; padding-right: 5px;}
+
+.callout{background: black; height: 231px;}
+
+.grid_3{margin-left: 60px;}
+
+.button{background: #242324; padding: 6px; text-transform: uppercase; color: white; font-size: 11px;}
+.button:hover{color: white; background: black;}
+
+p{font-size: 12px; line-height: 20px; color: #353535;}
+
+h1, h2{letter-spacing: -1px;}
+h3{line-height:1em;font-size: 26px; text-transform: lowercase; border-bottom: 1px solid #d1d1d1; padding-bottom: 15px; margin-bottom: 15px;}
+
+
+blockquote{position: relative;}
+blockquote p{font-size: 15px; line-height: 20px; font-style: italic; color: #0e0e0e; padding-top: 5px;}
+.main blockquote p:before, .main blockquote p:after{font-size: 40px; color:#bfbfbf; font-style: italic; padding-top: 3px;}
+.main blockquote p:first-child:before{content:'“'; position: absolute; left: -8px; top: 8px;}
+.main blockquote p:last-child:after{content:'”'; float: right; position: absolute; bottom:-15px; right:20px;}
+.main blockquote p{padding-left:15px;}
+
+footer{clear: both; border-top: 1px solid #d1d1d1; padding-top: 18px; margin-top: 30px;}
+
+.work h2, .work h4{font-weight:normal; font-size: 26px;}
+.work h2{font-size: 26px; margin-bottom: 0;}
+.work img{margin-bottom: 20px;}
+.work h4{color: #787878; margin-top: 0; margin-bottom: 30px; line-height: 1.2em; padding-right: 20px; border-bottom: 1px solid #d1d1d1; padding-bottom: 33px;}

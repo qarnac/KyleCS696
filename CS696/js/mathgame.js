@@ -1,3 +1,5 @@
+        // updated 9/11
+
         var drawingCanvas = document.getElementById('myCanvas'), context = drawingCanvas.getContext('2d'), difficulty = new Image();
 
         /*
@@ -11,12 +13,9 @@
         }
         difficulty.src = "../img/difficulty.png";
             
-<<<<<<< HEAD
         /*
           begins a countdown from 3 once a difficulty level has been clicked
         */
-=======
->>>>>>> 627041af5febe1c9776e17ad6cc421955490333d
         function startItUp(){
 
             var seconds = 2;
@@ -33,19 +32,12 @@
                     stopTimer();
                     runGame(); //after 3 seconds of notifying the player, start the game
                 }
-<<<<<<< HEAD
             },1000); // executes every 1000 milliseconds(i.e 1 sec)
         }
 
         /*
           clears the start interval in order to eliminate drawing the countdown to the canvas
         */
-=======
-        },1000); // executes every 1000 milliseconds(i.e 1 sec)
-
-        }
-
->>>>>>> 627041af5febe1c9776e17ad6cc421955490333d
         function stopTimer(){
             clearInterval(start);
         }
@@ -112,7 +104,6 @@
             canvas.removeEventListener('mousemove',movemouse);
             evt.target.style.cursor = 'default';
             startItUp();
-<<<<<<< HEAD
         }
 
         canvas.addEventListener('mousemove', movemouse); 
@@ -147,60 +138,6 @@
           r represents the radius of the corners
         */
         CanvasRenderingContext2D.prototype.roundRect = function(answer,r) {
-=======
-        }
-
-        canvas.addEventListener('mousemove', movemouse); 
-
-        /*
-          every instance of a cursor movement will cause this function to fire
-        */
-        function movemouse(evt){
-
-            var mousePos = getMousePos(canvas, evt);
-    
-            evt.target.style.cursor = 'default';
-    
-            //checks if easy difficulty is hovered
-            if(clickedOrHover(mousePos, easy)){
-                evt.target.style.cursor = 'pointer';
-            }
-            //checks if intermediate difficulty is hovered
-            else if(clickedOrHover(mousePos, intermediate)){
-                evt.target.style.cursor = 'pointer';
-            }
-            //checks if hard difficulty is hovered
-            else if(clickedOrHover(mousePos, hard)){
-                evt.target.style.cursor = 'pointer';
-            }
-        }
-
-        /*
-          gives rounded corners to drawn rectangles
-          sx and sy are the starting points for the top left of the rectangle
-          ex and ey and the ending points for the bottom right of the rectangle
-          r represents the radius of the corners
-        */
-        CanvasRenderingContext2D.prototype.roundRect = function(answer,r) {
-
-            var r2d = Math.PI/180;
-            
-            this.beginPath();
-            this.moveTo(answer.x+r,answer.y);
-            this.lineTo(answer.bx-r,answer.y);
-            this.arc(answer.bx-r,answer.y+r,r,r2d*270,r2d*360,false);
-            this.lineTo(answer.bx,answer.by-r);
-            this.arc(answer.bx-r,answer.by-r,r,r2d*0,r2d*90,false);
-            this.lineTo(answer.x+r,answer.by);
-            this.arc(answer.x+r,answer.by-r,r,r2d*90,r2d*180,false);
-            this.lineTo(answer.x,answer.y+r);
-            this.arc(answer.x+r,answer.y+r,r,r2d*180,r2d*270,false);
-            this.closePath();
-            this.strokeStyle = "#000";
-            this.font = "20pt sans-serif";
-            this.stroke();
-        }
->>>>>>> 627041af5febe1c9776e17ad6cc421955490333d
 
             var r2d = Math.PI/180;
             
@@ -235,10 +172,6 @@
             };
             muncher.image.src = "../img/spritesheet.png";
        
-<<<<<<< HEAD
-=======
-            
->>>>>>> 627041af5febe1c9776e17ad6cc421955490333d
             //answer positions on gameboard
             var answer1 = {x:0, y:0, bx:0, by:0};
             var answer2 = {x:0, y:0, bx:0, by:0};
@@ -262,6 +195,7 @@
                 answer2.x = answer1.x; 
                 answer2.y = answer1.y;
                
+                //randomly finds an answer2 position away from answer1
                 while(answer1.x == answer2.x || answer1.x == answer2.x + 1 || answer1.x == answer2.x - 1 && answer1.y == answer2.y || answer1.y == answer2.y + 1 || answer1.y == answer2.y - 1){
 
                     if(randomFromInterval(0, 1) == 1)
@@ -275,15 +209,12 @@
                     else{
                         answer2.y = randomFromInterval(8, 9);
                     }
-<<<<<<< HEAD
-=======
-
->>>>>>> 627041af5febe1c9776e17ad6cc421955490333d
                 }
                 
                 answer3.x = answer2.x;
                 answer3.y = answer2.y;
 
+                //randomly finds an answer3 position away from answer1 and answer2
                 while( (answer1.x == answer3.x || answer1.x == answer3.x + 1 || answer1.x == answer3.x - 1) && (answer1.y == answer3.y || answer1.y == answer3.y + 1 || answer1.y == answer3.y - 1) ||
                        (answer2.x == answer3.x || answer2.x == answer3.x + 1 || answer2.x == answer3.x - 1) && (answer2.y == answer3.y || answer2.y == answer3.y + 1 || answer2.y == answer3.y - 1) ){
 
@@ -298,12 +229,12 @@
                     else{
                         answer3.y = randomFromInterval(8, 9);
                     }
-<<<<<<< HEAD
                 }
                 
                 answer4.x = answer3.x;
                 answer4.y = answer3.y;
 
+                //randomly finds an answer4 position away from answer1, answer2, and answer3
                 while( (answer1.x == answer4.x || answer1.x == answer4.x + 1 || answer1.x == answer4.x - 1) && (answer1.y == answer4.y || answer1.y == answer4.y + 1 || answer1.y == answer4.y - 1) ||
                        (answer2.x == answer4.x || answer2.x == answer4.x + 1 || answer2.x == answer4.x - 1) && (answer2.y == answer4.y || answer2.y == answer4.y + 1 || answer2.y == answer4.y - 1) ||
                        (answer3.x == answer4.x || answer3.x == answer4.x + 1 || answer3.x == answer4.x - 1) && (answer3.y == answer4.y || answer3.y == answer4.y + 1 || answer3.y == answer4.y - 1) ){
@@ -326,36 +257,6 @@
                 answer1.bx = answer1.x + 62;
                 answer1.by = answer1.y + 62;
 
-=======
-
-                }
-                
-                answer4.x = answer3.x;
-                answer4.y = answer3.y;
-
-                while( (answer1.x == answer4.x || answer1.x == answer4.x + 1 || answer1.x == answer4.x - 1) && (answer1.y == answer4.y || answer1.y == answer4.y + 1 || answer1.y == answer4.y - 1) ||
-                       (answer2.x == answer4.x || answer2.x == answer4.x + 1 || answer2.x == answer4.x - 1) && (answer2.y == answer4.y || answer2.y == answer4.y + 1 || answer2.y == answer4.y - 1) ||
-                       (answer3.x == answer4.x || answer3.x == answer4.x + 1 || answer3.x == answer4.x - 1) && (answer3.y == answer4.y || answer3.y == answer4.y + 1 || answer3.y == answer4.y - 1) ){
-
-                    if(randomFromInterval(0, 1) == 1)
-                        answer4.x = randomFromInterval(2, 3);
-                    else{
-                        answer4.x = randomFromInterval(11, 12);
-                    }
-
-                    if(randomFromInterval(0, 1) == 1)
-                        answer4.y = randomFromInterval(2, 3);
-                    else{
-                        answer4.y = randomFromInterval(8, 9);
-                    }
-                }
-                
-                answer1.x = (64 * answer1.x) + 1;
-                answer1.y = (64 * answer1.y) + 1;
-                answer1.bx = answer1.x + 62;
-                answer1.by = answer1.y + 62;
-
->>>>>>> 627041af5febe1c9776e17ad6cc421955490333d
                 answer2.x = (64 * answer2.x) + 1;
                 answer2.y = (64 * answer2.y) + 1;
                 answer2.bx = answer2.x + 62;
@@ -458,13 +359,7 @@
         				    	muncher.xpos = 0;
         				    	muncher.ypos = 192;
         				    }
-<<<<<<< HEAD
         					muncher.direction = "up";
-=======
-        				
-        					muncher.direction = "up";
-
->>>>>>> 627041af5febe1c9776e17ad6cc421955490333d
         					break;
 
         				case 39:
@@ -472,12 +367,7 @@
         					if(muncher.direction != "right"){
         				    	muncher.xpos = 0;
         				    	muncher.ypos = 0;
-<<<<<<< HEAD
         				    }			
-=======
-        				    }
-        				
->>>>>>> 627041af5febe1c9776e17ad6cc421955490333d
         					muncher.direction = "right";
         					break;
 
@@ -486,12 +376,7 @@
         					if(muncher.direction != "down"){
         				    	muncher.xpos = 0;
         				    	muncher.ypos = 128;
-<<<<<<< HEAD
         				    }    				
-=======
-        				    }
-        				
->>>>>>> 627041af5febe1c9776e17ad6cc421955490333d
         					muncher.direction = "down";
         					break;
         			}
@@ -499,9 +384,4 @@
                 loadMuncher(muncher.xpos, muncher.ypos, gameboard.cxpos, gameboard.cypos); //reload image to new position on the gameboard
         	}
         	setInterval(gameLoop,800);
-<<<<<<< HEAD
         } 
-=======
-        }
-        
->>>>>>> 627041af5febe1c9776e17ad6cc421955490333d

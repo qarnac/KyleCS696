@@ -280,8 +280,11 @@
 
             function positionNum(answer){
 
-                if(answer.text > 9){
+                if(answer.text > 99){
 
+                    context.fillText(answer.text, answer.x + 8, answer.y + 41);
+                }
+                else if(answer.text > 9){
                     context.fillText(answer.text, answer.x + 15, answer.y + 41);
                 }
                 else{
@@ -299,7 +302,8 @@
             var score = 0, problemType;
             function createProblem(){
 
-                problemType = randomFromInterval(0, 1);
+                //problemType = randomFromInterval(0, 3);
+                problemType = 3;
 
                 switch(problemType){
                     //addition
@@ -309,21 +313,21 @@
                             question.num1 = randomFromInterval(0, 6);
                             question.num2 = randomFromInterval(0, 6);
                             answer1.text = question.num1 + question.num2;
-                            getIncorrectAnswers(question.num1, question.num2, 12);
+                            getIncorrectAnswers(answer1.text);
                         }
                         else if(intermediate.clicked == true){
 
-                            question.num1 = randomFromInterval(0, 9);
-                            question.num2 = randomFromInterval(0, 9);
+                            question.num1 = randomFromInterval(7, 20);
+                            question.num2 = randomFromInterval(0, 20);
                             answer1.text = question.num1 + question.num2;
-                             getIncorrectAnswers(question.num1, question.num2, 18);
+                            getIncorrectAnswers(answer1.text);
                         }
                         else{
 
-                            question.num1 = randomFromInterval(0, 12);
-                            question.num2 = randomFromInterval(0, 12);
+                            question.num1 = randomFromInterval(21, 30);
+                            question.num2 = randomFromInterval(0, 30);
                             answer1.text = question.num1 + question.num2;
-                             getIncorrectAnswers(question.num1, question.num2, 24);
+                            getIncorrectAnswers(answer1.text);
                         }
                         break;
                         
@@ -338,38 +342,104 @@
                                 question.num2 = randomFromInterval(0, 8);
                             }
                             answer1.text = question.num1 - question.num2;
-                             getIncorrectAnswers(question.num1, question.num2, 8);
+                            getIncorrectAnswers(answer1.text);
                         }
                         else if(intermediate.clicked == true){
 
-                            question.num1 = randomFromInterval(0, 14);
+                            question.num1 = randomFromInterval(15, 20);
                             question.num2 = randomFromInterval(0, 14);
 
-                            while(question.num2 >= question.num1){
-                                question.num2 = randomFromInterval(0, 14);
-                            }
+                           
                             answer1.text = question.num1 - question.num2;
-                             getIncorrectAnswers(question.num1, question.num2, 14);
+                            getIncorrectAnswers(answer1.text);
                         }
                         else{
 
-                            question.num1 = randomFromInterval(0, 20);
+                            question.num1 = randomFromInterval(21, 35);
                             question.num2 = randomFromInterval(0, 20);
 
-                            while(question.num2 >= question.num1){
-                                question.num2 = randomFromInterval(0, 20);
-                            }
                             answer1.text = question.num1 - question.num2;
-                             getIncorrectAnswers(question.num1, question.num2, 20);
+                            getIncorrectAnswers(answer1.text);
                         }
                         break;
-                    /*
+                    
                     //multiplication
                     case 2:
-                      
+
+                         if(easy.clicked == true){
+
+                            question.num1 = randomFromInterval(0, 5);
+                            question.num2 = randomFromInterval(0, 5);
+                            answer1.text = question.num1 * question.num2;
+                            getIncorrectAnswers(answer1.text);
+                        }
+                        else if(intermediate.clicked == true){
+
+                            question.num1 = randomFromInterval(6, 9);
+                            question.num2 = randomFromInterval(4, 9);
+                            answer1.text = question.num1 * question.num2;
+                            getIncorrectAnswers(answer1.text);
+                        }
+                        else{
+
+                            question.num1 = randomFromInterval(9, 12);
+                            question.num2 = randomFromInterval(5, 12);
+                            answer1.text = question.num1 * question.num2;
+                            getIncorrectAnswers(answer1.text);
+                        }
                         break;
+                      
+                
                     //division
                     case 3:
+
+                        if(easy.clicked == true){
+
+                            question.num1 = randomFromInterval(0, 25);
+                            question.num2 = randomFromInterval(1, 25);
+
+
+                            while(question.num1 % question.num2 != 0){
+
+                                question.num2 = randomFromInterval(1, 25);
+                            }
+
+                            answer1.text = question.num1 / question.num2;
+                            getIncorrectAnswers(answer1.text);
+                        }
+                        else if(intermediate.clicked == true){
+
+                            question.num1 = randomFromInterval(10, 48);
+                            question.num2 = randomFromInterval(2, 24);
+
+
+                            while(question.num1 % question.num2 != 0 || question.num1 / question.num2 == 1){
+
+                                question.num1 = randomFromInterval(10, 48);
+                                question.num2 = randomFromInterval(2, 24);
+                            }
+
+                            answer1.text = question.num1 / question.num2;
+                            getIncorrectAnswers(answer1.text);
+                        }
+                        else{
+
+                            question.num1 = randomFromInterval(20, 100);
+                            question.num2 = randomFromInterval(2, 50);
+
+
+                            while(question.num1 % question.num2 != 0 || question.num1 / question.num2 == 1){
+
+                                question.num1 = randomFromInterval(20, 100);
+                                question.num2 = randomFromInterval(2, 50);
+                            }
+
+                            answer1.text = question.num1 / question.num2;
+                            getIncorrectAnswers(answer1.text);
+                        }
+                        break;
+
+                    /*
                       
                         break;
                     //prime numbers
@@ -380,20 +450,33 @@
                }   
             }
 
-            function getIncorrectAnswers(num1, num2, upper){
+            function getIncorrectAnswers(answer){
 
-                answer2.text = randomFromInterval(0, upper);
-                answer3.text = randomFromInterval(0, upper);
-                answer4.text = randomFromInterval(0, upper);
+                answer2.text = getRandomArbitary(answer - 7, answer + 7);
+                answer3.text = getRandomArbitary(answer - 7, answer + 7);
+                answer4.text = getRandomArbitary(answer - 7, answer + 7);
 
-                while(answer2.text == answer1.text || answer2.text == -1)
-                    answer2.text = randomFromInterval(0, upper);
-                while(answer3.text == answer1.text || answer3.text == answer2.text || answer3.text == -1){
-                    answer3.text = randomFromInterval(0, upper);
+                while(answer2.text == answer1.text)
+                    answer2.text = getRandomArbitary(answer - 7, answer + 7);
+                while(answer3.text == answer1.text || answer3.text == answer2.text){
+                    answer3.text = getRandomArbitary(answer - 7, answer + 7);
                 }
-                while(answer4.text == answer1.text || answer4.text == answer2.text || answer4.text == answer3.text || answer4.text == -1){
-                    answer4.text = randomFromInterval(0, upper);
+                while(answer4.text == answer1.text || answer4.text == answer2.text || answer4.text == answer3.text){
+                    answer4.text = getRandomArbitary(answer - 7, answer + 7);
                 }
+            }
+
+            /*
+                Returns a random number between min and max
+            */
+            function getRandomArbitary (min, max) {
+                var num = -1;
+
+                while(num < 0){
+                    var num = Math.floor(Math.random() * (max - min + 1)) + min;
+                }
+
+                return num;
             }
 
             function drawProblem(){
@@ -404,6 +487,10 @@
                     context.fillText(question.num1 + " + " + question.num2, 445, 50);
                 else if(problemType == 1)
                     context.fillText(question.num1 + " - " + question.num2, 445, 50);
+                else if(problemType == 2)
+                    context.fillText(question.num1 + " x " + question.num2, 445, 50);
+                else if(problemType == 3)
+                    context.fillText(question.num1 + " ÷ " + question.num2, 445, 50);
             }
             function drawScore(){
 

@@ -302,8 +302,8 @@
             var score = 0, problemType;
             function createProblem(){
 
-                //problemType = randomFromInterval(0, 3);
-                problemType = 3;
+                problemType = randomFromInterval(0, 3);
+                
 
                 switch(problemType){
                     //addition

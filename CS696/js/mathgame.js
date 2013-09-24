@@ -300,11 +300,13 @@
 
             var question = {num1:0, num2:0}; 
             var score = 0, problemType;
+            //2d array for primes - easy - intermediate - hard
+            var primes = [[2,3,5,7,11,13,17,19,23] , [29,31,37,41,43,47,53,59,61] , [67,71,73,79,83,89,97,101,103]];
             function createProblem(){
 
-                problemType = randomFromInterval(0, 3);
+                problemType = randomFromInterval(0, 4);
                 
-
+                
                 switch(problemType){
                     //addition
                     case 0: 
@@ -389,7 +391,6 @@
                         }
                         break;
                       
-                
                     //division
                     case 3:
 
@@ -438,17 +439,94 @@
                             getIncorrectAnswers(answer1.text);
                         }
                         break;
-
-                    /*
-                      
-                        break;
+      
                     //prime numbers
                     case 4:
-                      
-                        break; 
-                        */
+
+                        var index = randomFromInterval(0, 8);
+
+                        if(easy.clicked == true){
+
+                            answer1.text = primes[0][index];
+                            getPrimeAnswers(answer1.text);
+                        }
+                        else if(intermediate.clicked == true){
+
+                            answer1.text = primes[1][index];
+                            getPrimeAnswers(answer1.text);
+                        }
+                        else{
+                            answer1.text = primes[2][index];
+                            getPrimeAnswers(answer1.text);
+                        }
+                    
+                        break;       
                }   
             }
+
+            function getPrimeAnswers(answer){
+
+                var checker = true;
+                while(checker || answer2.text == answer){
+
+                    answer2.text = getRandomArbitary(answer - 7, answer + 7);
+
+                    var count = 0;
+
+                    for(var i = 0; i < primes.length; ++i){
+
+                        for(var j = 0; j < primes[i].length; ++j){
+
+                            if(primes[i][j] == answer2.text)
+                                ++count;
+                        }
+                    }
+                    if(count == 0)
+                        checker = false;
+                }
+              
+                checker = true;
+
+                while(checker || answer3.text == answer || answer2.text == answer3.text){
+
+                    answer3.text = getRandomArbitary(answer - 7, answer + 7);
+
+                    var count = 0;
+
+                    for(var i = 0; i < primes.length; ++i){
+
+                        for(var j = 0; j < primes[i].length; ++j){
+
+                            if(primes[i][j] == answer3.text)
+                                ++count;
+                        }
+                    }
+                    if(count == 0)
+                        checker = false;
+                }
+
+                checker = true;
+
+                while(checker || answer4.text == answer || answer2.text == answer4.text || answer3.text == answer4.text){
+
+                    answer4.text = getRandomArbitary(answer - 7, answer + 7);
+
+                    var count = 0;
+
+                    for(var i = 0; i < primes.length; ++i){
+
+                        for(var j = 0; j < primes[i].length; ++j){
+
+                            if(primes[i][j] == answer4.text)
+                                ++count;
+                        }
+                    }
+                    if(count == 0)
+                        checker = false;
+                }
+            }
+
+
 
             function getIncorrectAnswers(answer){
 
@@ -475,7 +553,6 @@
                 while(num < 0){
                     var num = Math.floor(Math.random() * (max - min + 1)) + min;
                 }
-
                 return num;
             }
 
@@ -491,6 +568,9 @@
                     context.fillText(question.num1 + " x " + question.num2, 445, 50);
                 else if(problemType == 3)
                     context.fillText(question.num1 + " ÷ " + question.num2, 445, 50);
+                else{
+                    context.fillText("Prime Numbers", 340, 50);
+                }
             }
             function drawScore(){
 
@@ -570,26 +650,48 @@
             
         }
 
-
+            var timer;
+            
             /*
                 clears the gameLoop interval
             */
             function stopGame(){
             
-                clearInterval(gameLoop);
+                clearTimeout(timer);
                 context.clearRect(0,0,canvas.width, canvas.height);
+
+
             }
 
             getNewAnswerPositions();
             createProblem();
+
+            var fps;
+            var slow = document.getElementById('gameSpeed1');
+            var normal = document.getElementById('gameSpeed2');
+            var fast = document.getElementById('gameSpeed3');
 
             // Create gradient
             var grd = context.createLinearGradient(0,0,960,0);
             grd.addColorStop(0,"green");
             grd.addColorStop(1,"white");
 
+            gameLoop();
 
-			gameLoop = setInterval(function(){
+			function gameLoop(){
+
+                
+                if(slow.checked == true){
+                    fps = 800;
+                }
+                if(normal.checked == true){
+                    fps = 600;
+                }
+                if(fast.checked == true){
+                    fps = 300;
+                }
+
+                timer = setTimeout(gameLoop, fps);
 
         		context.clearRect(0,0,canvas.width, canvas.height);
 
@@ -644,7 +746,7 @@
         			evt = evt || window.event;
         			switch(evt.keyCode){
         				case 37:
-        				    
+        				    evt.preventDefault(); //prevents user from scrolling during gameplay
         				    if(muncher.direction != "left"){
         				    	muncher.xpos = 64;
         				    	muncher.ypos = 64;
@@ -653,7 +755,7 @@
         					break;
 
         				case 38:
-
+                            evt.preventDefault();
         					if(muncher.direction != "up"){
         				    	muncher.xpos = 0;
         				    	muncher.ypos = 192;
@@ -662,7 +764,7 @@
         					break;
 
         				case 39:
-
+                            evt.preventDefault();
         					if(muncher.direction != "right"){
         				    	muncher.xpos = 0;
         				    	muncher.ypos = 0;
@@ -671,7 +773,7 @@
         					break;
 
         				case 40:
-
+                            evt.preventDefault();
         					if(muncher.direction != "down"){
         				    	muncher.xpos = 0;
         				    	muncher.ypos = 128;
@@ -717,6 +819,6 @@
                     drawAnswers();
                     drawScore();
                 }
-        	}, 700);
+        	}
         }     
     }

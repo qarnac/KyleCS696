@@ -26,6 +26,32 @@
 			Your browser does not support the HTML5 canvas tag.
 		</canvas>
 		<span id="countdown"></span>
+		<form method="post">
+        	<fieldset id = "one">
+                <legend>Game Speed</legend>
+                        <input type="radio" name="gameSpeed" id="gameSpeed1" value="Slow" />Slow<br />
+                        <input type="radio" checked = "checked" name="gameSpeed" id="gameSpeed2" value="Normal" />Normal<br />
+                        <input type="radio" name="gameSpeed" id="gameSpeed3" value="Fast" />Fast<br />
+        	</fieldset>
+		</form>
+
+		<form method="post">
+        	<fieldset id = "two">
+                <legend>Enemy</legend>
+                        <input type="radio" checked = "checked" name="enemy" value="No" />No <br />
+                        <input type="radio" name="enemy" value="Yes" />Yes<br />
+        	</fieldset>
+		</form>
+
+		<form method="post">
+        	<fieldset id = "three">
+                <legend>Number of Answers</legend>
+                        <input type="radio" name="answers" value="2" />2 <br />
+                        <input type="radio" name="answers" value="3" />3<br />
+                        <input type="radio" checked = "checked" name="answers" value="4" />4<br />
+        	</fieldset>
+		</form>
+
 		<script src ="../js/mathgame.js"/> </script>
 
 

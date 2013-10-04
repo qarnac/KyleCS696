@@ -82,6 +82,7 @@
         function mousedown(evt){
 
             var mousePos = getMousePos(canvas, evt);
+            easy.clicked = false; intermediate.clicked = false; hard.clicked = false;
 
             //checks if easy difficulty clicked, if it is, then remove the event listeners
             if(clickedOrHover(mousePos, easy)){
@@ -265,17 +266,49 @@
                 }
             }
 
+
+            var twoAnswers = document.getElementById('twoAnswers');
+            var threeAnswers = document.getElementById('threeAnswers');
+            var fourAnswers = document.getElementById('fourAnswers');
+            var a2 = false;
+            var a3 = false;
+
             function drawAnswers(){
 
-                context.roundRect(answer1, 5);
-                context.roundRect(answer2, 5);
-                context.roundRect(answer3, 5);
-                context.roundRect(answer4, 5);
+                if(a2 == true){
+
+                    context.roundRect(answer1, 5);
+                    context.roundRect(answer2, 5);
+                  
+                    positionNum(answer1);
+                    positionNum(answer2);
+                    answer3.x = -100; answer3.y = -100;
+                    answer4.x = -100; answer4.y = -100;
+                    
+                }
+                else if(a3 == true){
+
+                    context.roundRect(answer1, 5);
+                    context.roundRect(answer2, 5);
+                    context.roundRect(answer3, 5);
+                    
+                    positionNum(answer1);
+                    positionNum(answer2);
+                    positionNum(answer3);
+                    answer4.x = -100; answer4.y = -100;
+                }
+                else{
+
+                    context.roundRect(answer1, 5);
+                    context.roundRect(answer2, 5);
+                    context.roundRect(answer3, 5);
+                    context.roundRect(answer4, 5);
                
-                positionNum(answer1);
-                positionNum(answer2);
-                positionNum(answer3);
-                positionNum(answer4);
+                    positionNum(answer1);
+                    positionNum(answer2);
+                    positionNum(answer3);
+                    positionNum(answer4);
+                }
             }
 
             function positionNum(answer){
@@ -285,6 +318,7 @@
                     context.fillText(answer.text, answer.x + 8, answer.y + 41);
                 }
                 else if(answer.text > 9){
+                    
                     context.fillText(answer.text, answer.x + 15, answer.y + 41);
                 }
                 else{
@@ -466,8 +500,70 @@
 
             function getPrimeAnswers(answer){
 
+                if(hard.clicked == false){
+                    var checker = true;
+                    while(checker || answer2.text == answer){
+
+                        answer2.text = getRandomArbitary(answer - 7, answer + 7);
+
+                        var count = 0;
+
+                        for(var i = 0; i < primes.length; ++i){
+
+                            for(var j = 0; j < primes[i].length; ++j){
+
+                                if(primes[i][j] == answer2.text)
+                                    ++count;
+                            }
+                        }
+                        if(count == 0)
+                            checker = false;
+                    }
+              
+                    checker = true;
+
+                    while(checker || answer3.text == answer || answer2.text == answer3.text){
+
+                        answer3.text = getRandomArbitary(answer - 7, answer + 7);
+
+                        var count = 0;
+
+                        for(var i = 0; i < primes.length; ++i){
+
+                            for(var j = 0; j < primes[i].length; ++j){
+
+                                if(primes[i][j] == answer3.text)
+                                    ++count;
+                            }
+                        }
+                        if(count == 0)
+                            checker = false;
+                    }
+
+                    checker = true;
+
+                    while(checker || answer4.text == answer || answer2.text == answer4.text || answer3.text == answer4.text){
+
+                        answer4.text = getRandomArbitary(answer - 7, answer + 7);
+
+                        var count = 0;
+
+                        for(var i = 0; i < primes.length; ++i){
+
+                            for(var j = 0; j < primes[i].length; ++j){
+
+                                if(primes[i][j] == answer4.text)
+                                    ++count;
+                            }
+                        }
+                        if(count == 0)
+                            checker = false;
+                    }
+            }
+            else{
+
                 var checker = true;
-                while(checker || answer2.text == answer){
+                while(checker || answer2.text == answer || answer2.text % 2 == 0){
 
                     answer2.text = getRandomArbitary(answer - 7, answer + 7);
 
@@ -487,7 +583,7 @@
               
                 checker = true;
 
-                while(checker || answer3.text == answer || answer2.text == answer3.text){
+                while(checker || answer3.text == answer || answer2.text == answer3.text || answer3.text % 2 == 0){
 
                     answer3.text = getRandomArbitary(answer - 7, answer + 7);
 
@@ -507,7 +603,7 @@
 
                 checker = true;
 
-                while(checker || answer4.text == answer || answer2.text == answer4.text || answer3.text == answer4.text){
+                while(checker || answer4.text == answer || answer2.text == answer4.text || answer3.text == answer4.text || answer4.text % 2 == 0){
 
                     answer4.text = getRandomArbitary(answer - 7, answer + 7);
 
@@ -525,6 +621,7 @@
                         checker = false;
                 }
             }
+        }
 
 
 
@@ -676,6 +773,20 @@
             grd.addColorStop(0,"green");
             grd.addColorStop(1,"white");
 
+            
+            if(twoAnswers.checked == true){
+                        a2 = true;
+                        a3 = false;
+                    }
+                    if(threeAnswers.checked == true){
+                        a2 = false;
+                        a3 = true;
+                    }
+                    if(fourAnswers.checked == true){
+                        a2 = false;
+                        a3 = false;
+                    }
+
             gameLoop();
 
 			function gameLoop(){
@@ -800,6 +911,20 @@
                     else{
                         loadMuncher(64, 192, muncher.cxpos, muncher.cypos);
                     }
+
+                    if(twoAnswers.checked == true){
+                        a2 = true;
+                        a3 = false;
+                    }
+                    if(threeAnswers.checked == true){
+                        a2 = false;
+                        a3 = true;
+                    }
+                    if(fourAnswers.checked == true){
+                        a2 = false;
+                        a3 = false;
+                    }
+
                     drawProblem();
                     drawAnswers();
                     drawScore();

@@ -104,7 +104,6 @@
             }
         }
         
-        
         /*
           removes the event listener for mousemove
         */
@@ -172,7 +171,9 @@
         */
         function runGame(){
 
-            var muncher = {image:new Image(),xpos:0,ypos:0,cxpos:448,cypos:320,direction:"right",framesize:64};
+            var muncher = {image:new Image(),xpos:0,ypos:0,cxpos:448,cypos:320,prevx:0,prevy:0,direction:"right",framesize:64};
+            var enemy = {image:new Image(),xpos:0,ypos:0,cxpos:0,cypos:704,prevx:0,prevy:0,direction:"right",prevDirection:"right",framesize:64};
+
             var gameboard = {framesize:64};
 
             context.clearRect(0,0,canvas.width, canvas.height);
@@ -182,7 +183,13 @@
                 context.drawImage(muncher.image,xpos,ypos,muncher.framesize,muncher.framesize,muncher.cxpos,muncher.cypos,gameboard.framesize,gameboard.framesize);
             }
             muncher.image.src = "../img/spritesheet.png";
-       
+
+            function loadEnemy(xpos, ypos, cxpos, cypos){
+
+                context.drawImage(enemy.image,xpos,ypos,enemy.framesize,enemy.framesize,enemy.cxpos,enemy.cypos,gameboard.framesize,gameboard.framesize);
+            }
+            enemy.image.src = "../img/enemy.png";
+
             //answer positions on gameboard
             var answer1 = {x:0, y:0, bx:0, by:0, text:-1};
             var answer2 = {x:0, y:0, bx:0, by:0, text:-1};
@@ -236,7 +243,6 @@
                     convertMovesToPixels(answer1);
                 }
 
-            
                 //finds a new position for answer 2 if it is adjacent to answer 1 
                 while( (answer1.x == answer2.x || answer1.x == answer2.x + 64 || answer1.x == answer2.x - 64) && (answer1.y == answer2.y || answer1.y == answer2.y + 64 || answer1.y == answer2.y - 64) || 
                        (muncher.cxpos == answer2.x + 63 || muncher.cxpos == answer2.x - 65 || muncher.cxpos == answer2.x - 1) && (muncher.cypos == answer2.y + 63 || muncher.cypos == answer2.y - 65 || muncher.cypos == answer2.y - 1) ) {
@@ -336,10 +342,10 @@
             var score = 0, problemType;
             //2d array for primes - easy - intermediate - hard
             var primes = [[2,3,5,7,11,13,17,19,23] , [29,31,37,41,43,47,53,59,61] , [67,71,73,79,83,89,97,101,103]];
+
             function createProblem(){
 
                 problemType = randomFromInterval(0, 4);
-                
                 
                 switch(problemType){
                     //addition
@@ -385,7 +391,6 @@
                             question.num1 = randomFromInterval(15, 20);
                             question.num2 = randomFromInterval(0, 14);
 
-                           
                             answer1.text = question.num1 - question.num2;
                             getIncorrectAnswers(answer1.text);
                         }
@@ -433,12 +438,10 @@
                             question.num1 = randomFromInterval(0, 25);
                             question.num2 = randomFromInterval(1, 25);
 
-
                             while(question.num1 % question.num2 != 0){
 
                                 question.num2 = randomFromInterval(1, 25);
                             }
-
                             answer1.text = question.num1 / question.num2;
                             getIncorrectAnswers(answer1.text);
                         }
@@ -447,13 +450,11 @@
                             question.num1 = randomFromInterval(10, 48);
                             question.num2 = randomFromInterval(2, 24);
 
-
                             while(question.num1 % question.num2 != 0 || question.num1 / question.num2 == 1){
 
                                 question.num1 = randomFromInterval(10, 48);
                                 question.num2 = randomFromInterval(2, 24);
                             }
-
                             answer1.text = question.num1 / question.num2;
                             getIncorrectAnswers(answer1.text);
                         }
@@ -462,13 +463,11 @@
                             question.num1 = randomFromInterval(20, 100);
                             question.num2 = randomFromInterval(2, 50);
 
-
                             while(question.num1 % question.num2 != 0 || question.num1 / question.num2 == 1){
 
                                 question.num1 = randomFromInterval(20, 100);
                                 question.num2 = randomFromInterval(2, 50);
                             }
-
                             answer1.text = question.num1 / question.num2;
                             getIncorrectAnswers(answer1.text);
                         }
@@ -493,7 +492,6 @@
                             answer1.text = primes[2][index];
                             getPrimeAnswers(answer1.text);
                         }
-                    
                         break;       
                }   
             }
@@ -623,8 +621,6 @@
             }
         }
 
-
-
             function getIncorrectAnswers(answer){
 
                 answer2.text = getRandomArbitary(answer - 7, answer + 7);
@@ -644,7 +640,8 @@
             /*
                 Returns a random number between min and max
             */
-            function getRandomArbitary (min, max) {
+            function getRandomArbitary(min, max){
+
                 var num = -1;
 
                 while(num < 0){
@@ -669,6 +666,19 @@
                     context.fillText("Prime Numbers", 340, 50);
                 }
             }
+
+            function drawEnemyWarning(){
+
+                context.beginPath();
+                context.arc(900, 30, 20, 0, 2 * Math.PI, false);
+                context.fillStyle = 'red';
+                context.fill();
+                context.lineWidth = 2;
+                context.strokeStyle = '#003300';
+                context.stroke();
+
+            }
+
             function drawScore(){
 
                 context.font = "50px Arial";
@@ -756,8 +766,6 @@
             
                 clearTimeout(timer);
                 context.clearRect(0,0,canvas.width, canvas.height);
-
-
             }
 
             getNewAnswerPositions();
@@ -789,8 +797,23 @@
 
             gameLoop();
 
+            var randomDirection;
+            var played = 0;
+            var c = 4;
+            var eaten = false;
+            var chase = 10;
+            var chaseOn = false;
+
 			function gameLoop(){
 
+                if(yesEnemy.checked == true  && played == 0){
+                    document.getElementById('bloop').play();
+                    played = 1;
+                }
+                if(noEnemy.checked == true){
+                    played = 0;
+                    chaseOn = false;
+                }
                 
                 if(slow.checked == true){
                     fps = 800;
@@ -809,6 +832,11 @@
                 // Fill with gradient
                 context.fillStyle=grd;
                 context.fillRect(0,0,960,63);
+
+                muncher.prevx = muncher.cxpos;
+                muncher.prevy = muncher.cypos;
+                enemy.prevx = enemy.cxpos;
+                enemy.prevy = enemy.cypos;
         
 
         		if(muncher.direction == "left"){
@@ -852,6 +880,189 @@
         			}
         		}
 
+                function currentDirection(dir){
+
+                    if(dir == "left"){
+                        enemy.direction = "left";
+                        if(enemy.prevDirection == enemy.direction){
+                            if(enemy.xpos == 0){
+                                enemy.xpos = 64;
+                                enemy.ypos = 64;
+                            }
+                            else{
+                                enemy.xpos = 0;
+                                enemy.ypos = 64;
+                            }
+                        }
+                        else{
+                            enemy.xpos = 0;
+                            enemy.ypos = 64;
+                        }
+                    }
+                    else if(dir == "right"){
+                        enemy.direction = "right";
+                        if(enemy.prevDirection == enemy.direction){
+                            if(enemy.xpos == 0){
+                                enemy.xpos = 64;
+                                enemy.ypos = 0;
+                            }
+                            else{
+                                enemy.xpos = 0;
+                                enemy.ypos = 0;
+                            }
+                        }
+                        else{
+                            enemy.xpos = 0;
+                            enemy.ypos = 0;
+                        }
+                    }
+                    else if(dir == "up"){
+                        enemy.direction = "up";
+                        if(enemy.prevDirection == enemy.direction){
+                            if(enemy.xpos == 0){
+                                enemy.xpos = 64;
+                                enemy.ypos = 128;
+                            }
+                            else{
+                                enemy.xpos = 0;
+                                enemy.ypos = 128;
+                            }
+                        }
+                        else{
+                            enemy.xpos = 0;
+                            enemy.ypos = 128;
+                        }
+                    }
+                    else{
+                        enemy.direction = "down";
+                        if(enemy.prevDirection == enemy.direction){
+                            if(enemy.xpos == 0){
+                                enemy.xpos = 64;
+                                enemy.ypos = 192;
+                            }
+                            else{
+                                enemy.xpos = 0;
+                                enemy.ypos = 192;
+                            }
+                        }
+                        else{
+                            enemy.xpos = 0;
+                            enemy.ypos = 192;
+                        }
+                    }
+                }
+
+                //calculate enemy movement
+                if(noEnemy.checked == true){
+
+                    enemy.cxpos = -100;
+                    enemy.cypos = -100;
+                }
+                else{
+
+                    if(enemy.cxpos == -100){
+                        enemy.cxpos = 0;
+                        enemy.cypos = 704;
+                    }
+
+                    enemy.prevDirection = enemy.direction;
+
+                    if(chase == 0)
+                        chaseOn = false;
+
+                    //if the enemy is close to the muncher, have it chase the muncher for 10 seconds
+                    if(Math.abs(enemy.cxpos - muncher.cxpos) <= 192 && Math.abs(enemy.cypos - muncher.cypos) <= 192 && chase == 10){
+                        chaseOn = true;
+                    }
+
+                    if(chaseOn == true){
+
+                        if(muncher.cypos < enemy.cypos){
+                            enemy.cypos -= 64;
+                            currentDirection("up");
+                        }
+                        else if(muncher.cypos > enemy.cypos){
+                            enemy.cypos += 64;
+                            currentDirection("down");
+                        }
+                        else if(muncher.cxpos > enemy.cxpos){
+                            enemy.cxpos += 64;
+                            currentDirection("right");
+                        }
+                        else if(muncher.cxpos < enemy.cxpos){
+                            enemy.cxpos -= 64;
+                            currentDirection("left");
+                        }
+                        
+                        --chase;
+
+                        if(chase == 0)
+                            chaseOn = false;
+                    }
+                    else{
+
+                        if(chase < 10)
+                            ++chase;
+
+                        if(enemy.direction == "right" && enemy.cxpos == 896 && enemy.cypos == 64){
+                            enemy.direction = "down";
+                            enemy.cypos += 64;
+                            currentDirection("down");
+                        }
+                        else if(enemy.direction == "right" && enemy.cxpos < 896){
+                            enemy.cxpos += 64;
+                            currentDirection("right");
+                        }
+                        else if(enemy.direction == "right" && enemy.cxpos == 896){
+                            enemy.direction = "up";
+                            enemy.cypos -= 64;
+                            currentDirection("up");
+                        }
+                        else if(enemy.direction == "up" && enemy.cxpos == 0 && enemy.cypos == 64){
+                            enemy.direction = "right";
+                            enemy.cxpos += 64;
+                            currentDirection("right");
+                        }
+                        else if(enemy.direction == "up" && enemy.cypos > 64){
+                            enemy.cypos -= 64;
+                            currentDirection("up");
+                        }
+                        else if(enemy.direction == "up" && enemy.cypos == 64){
+                            enemy.direction = "left";
+                            enemy.cxpos -= 64;
+                            currentDirection("left");
+                        }
+                        else if(enemy.direction == "left" && enemy.cxpos == 0 && enemy.cypos == 704){
+                            enemy.direction = "up";
+                            enemy.cypos -= 64;
+                            currentDirection("up");
+                        }
+                        else if(enemy.direction == "left" && enemy.cxpos > 0){
+                            enemy.cxpos -= 64;
+                            currentDirection("left");
+                        }
+                        else if(enemy.direction == "left" && enemy.cxpos == 0){
+                            enemy.direction = "down";
+                            enemy.cypos += 64;
+                            currentDirection("down");
+                        }
+                        else if(enemy.direction == "down" && enemy.cxpos == 896 && enemy.cypos == 704){
+                            enemy.direction = "left";
+                            enemy.cxpos -= 64;
+                            currentDirection("left");
+                        }
+                        else if(enemy.direction == "down" && enemy.cypos < 704){
+                            enemy.cypos += 64;
+                            currentDirection("down");
+                        }
+                        else if(enemy.direction == "down" && enemy.cypos == 704){
+                            enemy.direction = "right";
+                            enemy.cxpos += 64;
+                            currentDirection("right");
+                        }
+                    }
+                } 
+
         		document.onkeydown = function(evt){
 
         			evt = evt || window.event;
@@ -893,8 +1104,24 @@
         					break;
         			}
         		};
+
+                if(eaten == true){
+
+                    if(c == 0){
+
+                        stopGame();  
+                        drawEndGame();
+                    }
+                    else{
+                        loadEnemy(enemy.xpos, enemy.ypos, enemy.cxpos, enemy.cypos);
+                        drawProblem();
+                        drawAnswers();
+                        drawScore();
+                        --c;
+                    }
+                }
                 //if muncher runs into correct answer
-                if(muncher.cxpos == answer1.x - 1 && muncher.cypos == answer1.y - 1){
+                else if(muncher.cxpos == answer1.x - 1 && muncher.cypos == answer1.y - 1){
                     createProblem();
                     getNewAnswerPositions();
                     ++score;
@@ -928,21 +1155,49 @@
                     drawProblem();
                     drawAnswers();
                     drawScore();
+                    loadEnemy(enemy.xpos, enemy.ypos, enemy.cxpos, enemy.cypos);
+                    if(chaseOn == true)
+                        drawEnemyWarning();
+                    document.getElementById('chomp').play();
                 }
                 //if muncher runs into an incorrect answer or the game boundary
                 else if(muncher.cxpos == answer2.x -1 && muncher.cypos == answer2.y - 1 || 
                    muncher.cxpos == answer3.x -1 && muncher.cypos == answer3.y - 1 || 
                    muncher.cxpos == answer4.x -1 && muncher.cypos == answer4.y - 1 || 
-                   muncher.cxpos < 0 || muncher.cxpos >= 960 || muncher.cypos >= 768 || muncher.cypos < 64){
-                    
+                   muncher.cxpos < 0 || muncher.cxpos >= 960 || muncher.cypos >= 768){
+                
+                    if(score <= 4)
+                        document.getElementById('bad').play();
+                    else if(score > 4 && score < 8)
+                        document.getElementById('good').play();
+                    else
+                        document.getElementById('excellent').play();
+
                     stopGame();  
                     drawEndGame();
                 }
-                else{
-                    loadMuncher(muncher.xpos, muncher.ypos, muncher.cxpos, muncher.cypos); //reload image to new position on the gameboard
+                //check if enemy eats muncher
+                else if(muncher.cxpos == enemy.cxpos && muncher.cypos == enemy.cypos || enemy.prevx == muncher.cxpos && enemy.prevy == muncher.cypos && muncher.prevx == enemy.cxpos && muncher.prevy == enemy.cypos){
+
+                    document.getElementById('enemychomp').play();
+                  
+                    eaten = true;
+                    muncher.cxpos = -100;
+                    muncher.cypos = -100;
+                    loadEnemy(enemy.xpos, enemy.ypos, enemy.cxpos, enemy.cypos);
                     drawProblem();
                     drawAnswers();
                     drawScore();
+                }
+                else{
+
+                    loadMuncher(muncher.xpos, muncher.ypos, muncher.cxpos, muncher.cypos); //reload image to new position on the gameboard
+                    loadEnemy(enemy.xpos, enemy.ypos, enemy.cxpos, enemy.cypos);
+                    drawProblem();
+                    drawAnswers();
+                    drawScore();
+                    if(chaseOn == true)
+                        drawEnemyWarning();
                 }
         	}
         }     

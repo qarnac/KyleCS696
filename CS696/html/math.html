@@ -38,8 +38,8 @@
 		<form method="post">
         	<fieldset id = "two">
                 <legend>Enemy</legend>
-                        <input type="radio" checked = "checked" name="enemy" value="No" />No <br />
-                        <input type="radio" name="enemy" value="Yes" />Yes<br />
+                        <input type="radio" checked = "checked" name="enemy" id="noEnemy" value="No" />No <br />
+                        <input type="radio" name="enemy" id="yesEnemy" value="Yes" />Yes<br />
         	</fieldset>
 		</form>
 
@@ -51,6 +51,13 @@
                         <input type="radio" checked = "checked" name="answers" id="fourAnswers" value="4" />4<br />
         	</fieldset>
 		</form>
+
+		<audio id="chomp" src="../audio/chomp.wav" preload="auto"></audio>
+		<audio id="bad" src="../audio/bad.wav" preload="auto"></audio>
+		<audio id="good" src="../audio/good.wav" preload="auto"></audio>
+		<audio id="excellent" src="../audio/excellent.wav" preload="auto"></audio>
+		<audio id="bloop" src="../audio/bloop.wav" preload="auto"></audio>
+		<audio id="enemychomp" src="../audio/enemychomp.wav" preload="auto"></audio>
 
 		<script src ="../js/mathgame.js"/> </script>
 

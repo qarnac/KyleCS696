@@ -822,7 +822,7 @@
                     fps = 600;
                 }
                 if(fast.checked == true){
-                    fps = 300;
+                    fps = 400;
                 }
 
                 timer = setTimeout(gameLoop, fps);
@@ -971,7 +971,7 @@
                         chaseOn = false;
 
                     //if the enemy is close to the muncher, have it chase the muncher for 10 seconds
-                    if(Math.abs(enemy.cxpos - muncher.cxpos) <= 192 && Math.abs(enemy.cypos - muncher.cypos) <= 192 && chase == 10){
+                    if(Math.abs(enemy.cxpos - muncher.cxpos) <= 256 && Math.abs(enemy.cypos - muncher.cypos) <= 256 && chase == 10){
                         chaseOn = true;
                     }
 
@@ -1164,7 +1164,7 @@
                 else if(muncher.cxpos == answer2.x -1 && muncher.cypos == answer2.y - 1 || 
                    muncher.cxpos == answer3.x -1 && muncher.cypos == answer3.y - 1 || 
                    muncher.cxpos == answer4.x -1 && muncher.cypos == answer4.y - 1 || 
-                   muncher.cxpos < 0 || muncher.cxpos >= 960 || muncher.cypos >= 768){
+                   muncher.cxpos < 0 || muncher.cxpos >= 960 || muncher.cypos >= 768 || muncher.cypos < 64){
                 
                     if(score <= 4)
                         document.getElementById('bad').play();
@@ -1182,6 +1182,7 @@
                     document.getElementById('enemychomp').play();
                   
                     eaten = true;
+                    chaseOn = false;
                     muncher.cxpos = -100;
                     muncher.cypos = -100;
                     loadEnemy(enemy.xpos, enemy.ypos, enemy.cxpos, enemy.cypos);

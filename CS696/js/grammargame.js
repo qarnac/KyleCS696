@@ -9,7 +9,7 @@ var problem = "";
 
 var buttonOff = new Image();
 buttonOff.onload = function(){
-	context.drawImage(buttonOff,0,0,81,48,450,480,81,48);
+	context.drawImage(buttonOff,0,0,81,48,440,480,81,48);
 };
 buttonOff.src = "../img/buttonOff.png";
 
@@ -48,7 +48,6 @@ calculateBegEnd();
 displaySentence();
 calculateWordWidths();
 calculateWordPoints();
-
 
 /*
 	returns the mouse position of the cursor in the canvas
@@ -90,11 +89,13 @@ function movemouse(evt){
     }
 
     if(mousePos.x >= 450 && mousePos.x <= 531 && mousePos.y >= 480 && mousePos.y <= 528){
-    	context.drawImage(buttonOn,0,0,81,48,450,480,81,48);
+    	context.drawImage(buttonOn,0,0,81,48,440,480,81,48);
     }
     else
     	buttonOff.onload();
 }
+
+var tryAgain = false;
 
 canvas.addEventListener('mousedown', mousedown); 
 /*
@@ -102,6 +103,12 @@ canvas.addEventListener('mousedown', mousedown);
 */
 function mousedown(evt){
 
+	if(tryAgain){
+		context.clearRect(0,0,canvas.width, canvas.height);
+    	displaySentence();
+    	buttonOff.onload();
+	}
+	tryAgain = false;
     var mousePos = getMousePos(canvas, evt);
             
     for(var i = 0; i < sentence.words1.length; ++i){
@@ -153,7 +160,6 @@ function parseSentence(){
 function calculateBegEnd(){
 	sentence.startLine1 = measureText(sentence.line1, 40, 'Arial').width;
 	sentence.startLine1 = (960 - sentence.startLine1) / 2;
-
 	sentence.startLine2 = measureText(sentence.line2, 40, 'Arial').width;
 	sentence.startLine2 = (960 - sentence.startLine2) / 2;
 }
@@ -194,16 +200,23 @@ function initializeClicked(){
 		sentence.clicked2[i] = false;
 }
 
-
-//calculates the widths of each word in the line1 and line2
+//calculates the widths of each word in the line1 and line2, removes commas and periods from the widths 
 function calculateWordWidths(){
 	for(var i = 0; i < sentence.words1.length; ++i){
 		sentence.wordwidths1[i] = measureText(sentence.words1[i], 40, 'Arial').width;
+		var tempWord = sentence.words1[i];
+		var len = sentence.words1[i].length;
+		if(tempWord[len - 1] == ',' || tempWord[len - 1] == '.')
+			sentence.wordwidths1[i] -= 11;
 		sentence.startingPoint1xpos[i] = 0;
 	}
 
 	for(var i = 0; i < sentence.words2.length; ++i){
 		sentence.wordwidths2[i] = measureText(sentence.words2[i], 40, 'Arial').width;
+		var tempWord = sentence.words2[i];
+		var len = sentence.words2[i].length;
+		if(tempWord[len - 1] == ',' || tempWord[len - 1] == '.')
+			sentence.wordwidths2[i] -= 11;
 		sentence.startingPoint2xpos[i] = 0;
 	}
 }
@@ -265,10 +278,6 @@ function measureText(pText, pFontSize, pStyle) {
     lDiv.style.left = -1000;
     lDiv.style.top = -1000;
 
-    pText = pText.replace(',' , "" );
-    pText = pText.replace('.' , "" );
-
-
     lDiv.innerHTML = pText;
 
     var lResult = {
@@ -282,11 +291,8 @@ function measureText(pText, pFontSize, pStyle) {
     return lResult;
 }
 
-
-
 function doneClicked(){
 
-		
 		sentence.answerWrong = false;
 
 		//nouns
@@ -413,32 +419,94 @@ function doneClicked(){
 			}
 		}
 		
-		if(sentence.problemCount % 3 == 0){
-
-			if(sentence.answerWrong || sentence.correct < 2)
-				context.drawImage(errorMark,0,0,50,50,590,480,50,50);
-    		else
-    			context.drawImage(checkMark,0,0,50,50,590,483,50,50);
+		var clickCount = 0;
+		/*
+		Determines if there are no words clicked, then display try again message
+		---------------------------------------------------------------------------------
+		*/
+		for(var i = 0; i < sentence.words1.length; ++i){
+			if(sentence.clicked1[i]){
+				++clickCount;
+				break;
+			}
 		}
-    	//incorrect word is clicked
-    	else if(sentence.answerWrong || sentence.correct < 3)
+		for(var i = 0; i < sentence.words2.length; ++i){
+			if(sentence.clicked2[i]){
+				++clickCount;
+				break;
+			}
+		}
+
+		if(clickCount == 0){
+
+			context.font = "20px Arial";
+			context.fillStyle = 'darkRed';
+			context.fillText("No words selected, try again!", 351, 580);
+			tryAgain = true;
+		}
+		/*
+		For adjective problems
+		---------------------------------------------------------------------------------
+		*/
+		else if(sentence.problemCount % 3 == 0){
+
+			if(!sentence.answerWrong && sentence.correct == 1){
+				context.font = "20px Arial";
+				context.fillStyle = 'darkRed';
+				context.fillText("Select one more adjective!", 363.5, 580);
+				tryAgain = true;
+			}
+			else if(sentence.answerWrong || sentence.correct < 2){
+				context.drawImage(errorMark,0,0,50,50,590,480,50,50);
+				++sentence.problemCount;
+			}
+    		else{
+    			context.drawImage(checkMark,0,0,50,50,590,483,50,50);
+    			++sentence.problemCount;
+    		}
+		}
+		/*
+		For noun and verb problems
+		---------------------------------------------------------------------------------
+		*/
+    	else if(!sentence.answerWrong && sentence.correct == 1) {
+    		context.font = "20px Arial";
+			context.fillStyle = 'darkRed';
+			context.fillText("One correct, select two more!", 351, 580);
+			tryAgain = true;
+    	}
+    	else if(!sentence.answerWrong && sentence.correct == 2) {
+    		context.font = "20px Arial";
+			context.fillStyle = 'darkRed';
+			context.fillText("Two correct, select one more!", 351, 580);
+			tryAgain = true;
+    	}
+    	//an incorrect word is clicked, display error png
+    	else if(sentence.answerWrong || sentence.correct < 3){
     		context.drawImage(errorMark,0,0,50,50,590,480,50,50);
-    	//enough correct answers clicked
-    	else
+    		++sentence.problemCount;
+    	}
+    	//enough correct answers clicked, display checkMark png
+    	else{
     		context.drawImage(checkMark,0,0,50,50,590,483,50,50);
-    		
-    	++sentence.problemCount;
+    		++sentence.problemCount;
+    	}
     	sentence.correct = 0;
 
-    
-    	window.setTimeout(function(){
+    	/*
+    	If user is correct or incorrect then wipe canvas and display next problem after 1.3 seconds
+		---------------------------------------------------------------------------------
+		*/	
+    	if(!tryAgain){
+    		window.setTimeout(function(){
 
-    		context.clearRect(0,0,canvas.width, canvas.height);
-    		initializeClicked();
-    		displaySentence();
-    		buttonOff.onload();
+    			context.clearRect(0,0,canvas.width, canvas.height);
+    			initializeClicked();
+    			displaySentence();
+    			buttonOff.onload();
     	
-    	},1000);	
+    		},1300);	
+    	}
 }
 
 /*

@@ -49,6 +49,7 @@ displaySentence();
 calculateWordWidths();
 calculateWordPoints();
 
+
 /*
 	returns the mouse position of the cursor in the canvas
 */
@@ -172,6 +173,13 @@ function displaySentence(){
 	context.fillText(sentence.line2, sentence.startLine2, 400);
 
 	// Fill with gradient
+	if(sentence.problemCount % 3 == 1)
+		grd.addColorStop(0,"Maroon");
+	else if(sentence.problemCount % 3 == 2)
+		grd.addColorStop(0,"darkBlue");
+	else
+		grd.addColorStop(0,"darkGreen");
+
 	context.fillStyle=grd;
 	context.fillRect(0,0,960,63);
 	context.font = "50px Arial";
@@ -179,15 +187,15 @@ function displaySentence(){
 
 	if(sentence.problemCount % 3 == 1){
 		problem = "Click on three nouns";
-		context.fillText(problem, 280, 50);
+		context.fillText(problem, 250, 50);
 	}
 	else if(sentence.problemCount % 3 == 2){
 		problem = "Click on three verbs";
-		context.fillText(problem, 280, 50);
+		context.fillText(problem, 257, 50);
 	}
 	else{
 		problem = "Click on two adjectives";
-		context.fillText(problem, 235, 50);
+		context.fillText(problem, 226, 50);
 	}
 }
 
@@ -459,10 +467,12 @@ function doneClicked(){
 			else if(sentence.answerWrong || sentence.correct < 2){
 				context.drawImage(errorMark,0,0,50,50,590,480,50,50);
 				++sentence.problemCount;
+				document.getElementById('fail').play();
 			}
     		else{
     			context.drawImage(checkMark,0,0,50,50,590,483,50,50);
     			++sentence.problemCount;
+    			document.getElementById('cash').play();
     		}
 		}
 		/*
@@ -485,13 +495,17 @@ function doneClicked(){
     	else if(sentence.answerWrong || sentence.correct < 3){
     		context.drawImage(errorMark,0,0,50,50,590,480,50,50);
     		++sentence.problemCount;
+    		document.getElementById('fail').play();
     	}
     	//enough correct answers clicked, display checkMark png
     	else{
     		context.drawImage(checkMark,0,0,50,50,590,483,50,50);
     		++sentence.problemCount;
+    		document.getElementById('cash').play();
     	}
     	sentence.correct = 0;
+
+    	
 
     	/*
     	If user is correct or incorrect then wipe canvas and display next problem after 1.3 seconds
@@ -500,10 +514,26 @@ function doneClicked(){
     	if(!tryAgain){
     		window.setTimeout(function(){
 
-    			context.clearRect(0,0,canvas.width, canvas.height);
-    			initializeClicked();
-    			displaySentence();
-    			buttonOff.onload();
+    		context.clearRect(0,0,canvas.width, canvas.height);
+
+    		if(sentence.problemCount == 4){
+    			//initialize the lines for the sentence
+				sentence.line1 = "Sally drove to the brand-new supermarket";
+				sentence.line2 = "to purchase a delicious cake that she ordered.";
+				answers.nouns = ["Sally", "supermarket", "cake"];
+				answers.verbs = ["drove", "purchase", "ordered."];
+				answers.adjectives = ["brand-new", "delicious"];
+
+				parseSentence();
+				calculateBegEnd();
+				calculateWordWidths();
+				calculateWordPoints();
+    		}
+    	
+    		initializeClicked();
+    		displaySentence();
+    		buttonOff.onload();
+    		
     	
     		},1300);	
     	}

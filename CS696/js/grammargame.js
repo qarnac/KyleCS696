@@ -23,32 +23,31 @@ var errorMark = new Image();
 errorMark.src = "../img/errorMark.png";
 
 //sentence object contains both the parsed words, widths, heights, starting points, and ending points
-var sentence = {words1:[""], words2:[""], wordwidths1:[], wordwidths2:[], clicked1:[], clicked2:[],  
+var sentence = {words1:[""], words2:[""], wordwidths1:[], wordwidths2:[], clicked1:[], clicked2:[], picked:[],  
 	 		    startingPoint1xpos:[], startingPoint2xpos:[],
 	 		    endingPoint1xpos:[], endingPoint2xpos:[], 
-	 		    startingPoint1ypos:300, startingPoint2ypos:370,
+	 		    startingPoint1ypos:298, startingPoint2ypos:368,
 	 		    endingPoint1ypos:340, endingPoint2ypos: 410,
 	 		    startLine1:0, startLine2:0,
 	 		    line1: "", line2:"",
-	 		    correct: 0, answerWrong: false, problemCount: 1   
+	 		    correct: 0, answerWrong: false, problemCount: 1  
 	 		};
 //answers object contains string arrays for each problem type
 var answers = {nouns:[""],verbs:[""],adjectives:[""]};
 
-//initialize the lines for the sentence
-sentence.line1 = "Once the shiny gates opened, Jimmy ran to wait in";
-sentence.line2 = "line for the scariest ride at Disneyland.";
-answers.nouns = ["gates", "Jimmy", "line", "ride", "Disneyland."];
-answers.verbs = ["opened,", "ran", "wait"];
-answers.adjectives = ["shiny", "scariest"];
+for(var i = 0; i < 5; ++i){
+	sentence.picked[i] = false;
+}
 
-parseSentence();
-initializeClicked();
-calculateBegEnd();
-displaySentence();
-calculateWordWidths();
-calculateWordPoints();
+var random = getRandomInt(0, 4);
 
+
+
+function getRandomInt (min, max) {
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
+pickRandomSentence(random);
 
 /*
 	returns the mouse position of the cursor in the canvas
@@ -245,9 +244,9 @@ function calculateWordPoints(){
 				sentence.startingPoint1xpos[i] += sentence.wordwidths1[j] + 11;
  		}
 		//add the space between the left boundary and the 1st word to get the final starting point of the current word in the sentence
-		sentence.startingPoint1xpos[i] += sentence.startLine1;
+		sentence.startingPoint1xpos[i] += sentence.startLine1 - 2;
 		//ending point is the starting point plus the width of the current word
-		sentence.endingPoint1xpos[i] = sentence.startingPoint1xpos[i] + sentence.wordwidths1[i];
+		sentence.endingPoint1xpos[i] = sentence.startingPoint1xpos[i] + sentence.wordwidths1[i] + 4;
 	}
 
 	//calculates the starting and ending points for the words in line2
@@ -265,9 +264,9 @@ function calculateWordPoints(){
 				sentence.startingPoint2xpos[i] += sentence.wordwidths2[j] + 11;
  		}
 		//add the space between the left boundary and the 1st word to get the final starting point of the current word in the sentence
-		sentence.startingPoint2xpos[i] += sentence.startLine2;
+		sentence.startingPoint2xpos[i] += sentence.startLine2 - 2;
 		//ending point is the starting point plus the width of the current word
-		sentence.endingPoint2xpos[i] = sentence.startingPoint2xpos[i] + sentence.wordwidths2[i];
+		sentence.endingPoint2xpos[i] = sentence.startingPoint2xpos[i] + sentence.wordwidths2[i] + 4;
 	}
 }
 
@@ -516,25 +515,21 @@ function doneClicked(){
 
     		context.clearRect(0,0,canvas.width, canvas.height);
 
-    		if(sentence.problemCount == 4){
-    			//initialize the lines for the sentence
-				sentence.line1 = "Sally drove to the brand-new supermarket";
-				sentence.line2 = "to purchase a delicious cake that she ordered.";
-				answers.nouns = ["Sally", "supermarket", "cake"];
-				answers.verbs = ["drove", "purchase", "ordered."];
-				answers.adjectives = ["brand-new", "delicious"];
-
-				parseSentence();
-				calculateBegEnd();
-				calculateWordWidths();
-				calculateWordPoints();
+    		if(sentence.problemCount == 16){
+    			alert("end of game");
+    		}
+    		else if(sentence.problemCount % 3 == 1){
+    			var random = getRandomInt(0, 4);
+    		
+				pickRandomSentence(random);
+    		}
+    		else{
+    			initializeClicked();
+    			displaySentence();
     		}
     	
-    		initializeClicked();
-    		displaySentence();
     		buttonOff.onload();
     		
-    	
     		},1300);	
     	}
 }
@@ -564,3 +559,54 @@ CanvasRenderingContext2D.prototype.roundRect = function(x, y, bx, by, color, r) 
     this.font = "20pt sans-serif";
     this.stroke();
 };
+
+function pickRandomSentence(random){
+
+	while(sentence.picked[random] == true){
+		random = getRandomInt(0, 4);
+	}
+	//initialize the lines for the sentence
+	if(random == 0){
+		sentence.line1 = "Once the shiny gates opened, Jimmy ran to wait in";
+		sentence.line2 = "line for the scariest ride at Disneyland.";
+		answers.nouns = ["gates", "Jimmy", "line", "ride", "Disneyland."];
+		answers.verbs = ["opened,", "ran", "wait"];
+		answers.adjectives = ["shiny", "scariest"];
+	}
+	else if(random == 1){
+		sentence.line1 = "Sally drove to the brand-new supermarket";
+		sentence.line2 = "to purchase a delicious cake that she ordered.";
+		answers.nouns = ["Sally", "supermarket", "cake"];
+		answers.verbs = ["drove", "purchase", "ordered."];
+		answers.adjectives = ["brand-new", "delicious"];
+	}
+	else if(random == 2){
+		sentence.line1 = "The annoyed busman hit the brakes to frighten";
+		sentence.line2 = "the screaming kids playing in the back of the bus.";
+		answers.nouns = ["busman", "brakes", "kids", "back", "bus."];
+		answers.verbs = ["hit", "frighten", "playing"];
+		answers.adjectives = ["annoyed", "screaming"];
+	}
+	else if(random == 3){
+		sentence.line1 = "The brave sailor safely swam away from danger after";
+		sentence.line2 = "pirates destroyed the boat that belonged to the crew.";
+		answers.nouns = ["sailor", "danger", "pirates", "boat", "crew."];
+		answers.verbs = ["swam", "destroyed", "belonged"];
+		answers.adjectives = ["brave", "safely"];
+	}
+	else if(random == 4){
+		sentence.line1 = "My Mom panicked and shouted for assistance when";
+		sentence.line2 = "a dark, hairy spider scurried across the carpet.";
+		answers.nouns = ["Mom", "assistance", "spider", "carpet."];
+		answers.verbs = ["panicked", "shouted", "scurried"];
+		answers.adjectives = ["dark,", "hairy"];
+	}
+	sentence.picked[random] = true;
+
+	parseSentence();
+	initializeClicked();
+	calculateBegEnd();
+	displaySentence();
+	calculateWordWidths();
+	calculateWordPoints();
+}

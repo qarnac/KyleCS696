@@ -44,6 +44,13 @@ function drawProgress(current) {
 drawProgress(2);
 */
 
+var progMeter = 0;
+var total_width = 300;
+var total_height = 34;
+var initial_x = 345;
+var initial_y = 150;
+var radius = total_height/2;
+
 function rndRect(x, y, width, height, radius) {
     context.beginPath();
     context.moveTo(x + radius, y);
@@ -106,22 +113,13 @@ function progressBarRect(x, y, width, height, radius, max) {
     }
     context.closePath();
     context.fillStyle = 'green';
-    context.fill();
- 
-    
+    context.fill();  
 }
 
-var progMeter = 0;
-var total_width = 300;
-var total_height = 34;
-var initial_x = 345;
-var initial_y = 150;
-var radius = total_height/2;
-
-function progressText(x, y, width, max) {
+function progressText(x,y,width) {
     context.save();
     context.fillStyle = 'white';
-    var text = Math.floor(width/max*100)+"%";
+    var text = Math.floor(width/total_width*100)+"%";
    
     context.font = "20px Arial";
     context.fillText(text, initial_x+14, y+25);
@@ -130,7 +128,7 @@ function progressText(x, y, width, max) {
 
 progressLayerRect(initial_x, initial_y, total_width, total_height, radius);
 progressBarRect(initial_x, initial_y, progMeter, total_height, radius, total_width);
-progressText(initial_x, initial_y, progMeter, total_width);
+progressText(initial_x, initial_y, progMeter);
 
 //sentence object contains both the parsed words, widths, heights, starting points, and ending points
 var sentence = {words1:[""], words2:[""], wordwidths1:[], wordwidths2:[], clicked1:[], clicked2:[], picked:[],  

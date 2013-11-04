@@ -22,6 +22,116 @@ checkMark.src = "../img/checkMark.png";
 var errorMark = new Image();
 errorMark.src = "../img/errorMark.png";
 
+var imd = null;
+
+/*
+context.beginPath();
+context.strokeStyle = '#99CC33';
+context.lineCap = 'square';
+context.closePath();
+context.fill();
+context.lineWidth = 10.0;
+
+imd = context.getImageData(0,0,240,240);
+
+function drawProgress(current) {
+    context.putImageData(imd, 0, 0);
+    context.beginPath();
+    context.arc(480, 170, 60, Math.PI / 2, 3 * Math.PI / current, true);
+    context.stroke();
+}
+
+drawProgress(2);
+*/
+
+function rndRect(x, y, width, height, radius) {
+    context.beginPath();
+    context.moveTo(x + radius, y);
+    context.lineTo(x + width - radius, y);
+    context.arc(x+width-radius, y+radius, radius, -Math.PI/2, Math.PI/2, false);
+    context.lineTo(x + radius, y + height);
+    context.arc(x+radius, y+radius, radius, Math.PI/2, 3*Math.PI/2, false);
+    context.closePath();
+    context.fill();
+}
+
+function progressLayerRect(x, y, width, height, radius) {
+    context.save();
+ 
+     // first grey layer
+    context.fillStyle = 'rgba(189,189,189,1)';
+    rndRect(x, y, width, height, radius);
+ 
+    // second layer with gradient
+    var lingrad = context.createLinearGradient(0,y+height,0,0);
+    lingrad.addColorStop(0, 'rgba(255,255,255, 0.1)');
+    lingrad.addColorStop(0.4, 'rgba(255,255,255, 0.7)');
+    lingrad.addColorStop(1, 'rgba(255,255,255,0.4)');
+    context.fillStyle = lingrad;
+    rndRect(x, y, width, height, radius);
+ 
+    context.restore();
+}
+
+function progressBarRect(x, y, width, height, radius, max) {
+    // deplacement for chord drawing
+    var offset = 0;
+    context.beginPath();
+    if (width<radius) {
+        offset = radius - Math.sqrt(Math.pow(radius,2)-Math.pow((radius-width),2));
+        // Left angle
+        var left_angle = Math.acos((radius - width) / radius);
+        context.moveTo(x + width, y+offset);
+        context.lineTo(x + width, y+height-offset);
+        context.arc(x + radius, y + radius, radius, Math.PI - left_angle, Math.PI + left_angle, false);
+    }
+    else if (width+radius>max) {
+        offset = radius - Math.sqrt(Math.pow(radius,2)-Math.pow((radius - (max-width)),2));
+        // Right angle
+        var right_angle = Math.acos((radius - (max-width)) / radius);
+        context.moveTo(x + radius, y);
+        context.lineTo(x + width, y);
+        context.arc(x+max-radius, y + radius, radius, -Math.PI/2, -right_angle, false);
+        context.lineTo(x + width, y+height-offset);
+        context.arc(x+max-radius, y + radius, radius, right_angle, Math.PI/2, false);
+        context.lineTo(x + radius, y + height);
+        context.arc(x+radius, y+radius, radius, Math.PI/2, 3*Math.PI/2, false);
+    }
+    else {
+        context.moveTo(x + radius, y);
+        context.lineTo(x + width, y);
+        context.lineTo(x + width, y + height);
+        context.lineTo(x + radius, y + height);
+        context.arc(x+radius, y+radius, radius, Math.PI/2, 3*Math.PI/2, false);
+    }
+    context.closePath();
+    context.fillStyle = 'green';
+    context.fill();
+ 
+    
+}
+
+var progMeter = 0;
+var total_width = 300;
+var total_height = 34;
+var initial_x = 345;
+var initial_y = 150;
+var radius = total_height/2;
+
+function progressText(x, y, width, max) {
+    context.save();
+    context.fillStyle = 'white';
+    var text = Math.floor(width/max*100)+"%";
+   
+    context.font = "20px Arial";
+    context.fillText(text, initial_x+14, y+25);
+    context.restore();
+}
+
+progressLayerRect(initial_x, initial_y, total_width, total_height, radius);
+progressBarRect(initial_x, initial_y, progMeter, total_height, radius, total_width);
+progressText(initial_x, initial_y, progMeter, total_width);
+
 //sentence object contains both the parsed words, widths, heights, starting points, and ending points
 var sentence = {words1:[""], words2:[""], wordwidths1:[], wordwidths2:[], clicked1:[], clicked2:[], picked:[],  
 	 		    startingPoint1xpos:[], startingPoint2xpos:[],
@@ -41,14 +151,12 @@ for(var i = 0; i < 5; ++i){
 
 var random = getRandomInt(0, 4);
 
-
-
 function getRandomInt (min, max) {
     return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
 pickRandomSentence(random);
-
+      
 /*
 	returns the mouse position of the cursor in the canvas
 */
@@ -93,6 +201,10 @@ function movemouse(evt){
     }
     else
     	buttonOff.onload();
+
+    progressLayerRect(initial_x, initial_y, total_width, total_height, radius);
+	progressBarRect(initial_x, initial_y, progMeter, total_height, radius, total_width);
+	progressText(initial_x, initial_y, progMeter, total_height, radius, total_width);
 }
 
 var tryAgain = false;
@@ -143,6 +255,10 @@ function mousedown(evt){
     	
     	doneClicked();
     }
+   
+    progressLayerRect(initial_x, initial_y, total_width, total_height, radius);
+	progressBarRect(initial_x, initial_y, progMeter, total_height, radius, total_width);
+	progressText(initial_x, initial_y, progMeter, total_height, radius, total_width);
 }
 
 /*
@@ -318,8 +434,7 @@ function doneClicked(){
 					}
 
 					if(tempCount == 0){
-						sentence.answerWrong = true;
-						
+						sentence.answerWrong = true;	
 					}
 				}
 			}
@@ -338,7 +453,6 @@ function doneClicked(){
 
 					if(tempCount == 0){
 						sentence.answerWrong = true;
-						
 					}
 				}
 			}
@@ -360,7 +474,6 @@ function doneClicked(){
 
 					if(tempCount == 0){
 						sentence.answerWrong = true;
-						
 					}
 				}
 			}
@@ -378,8 +491,7 @@ function doneClicked(){
 					}
 
 					if(tempCount == 0){
-						sentence.answerWrong = true;
-						
+						sentence.answerWrong = true;	
 					}
 				}
 			}
@@ -400,8 +512,7 @@ function doneClicked(){
 					}
 
 					if(tempCount == 0){
-						sentence.answerWrong = true;
-						
+						sentence.answerWrong = true;	
 					}
 				}
 			}
@@ -420,7 +531,6 @@ function doneClicked(){
 
 					if(tempCount == 0){
 						sentence.answerWrong = true;
-						
 					}
 				}
 			}
@@ -504,13 +614,12 @@ function doneClicked(){
     	}
     	sentence.correct = 0;
 
-    	
-
     	/*
     	If user is correct or incorrect then wipe canvas and display next problem after 1.3 seconds
 		---------------------------------------------------------------------------------
 		*/	
     	if(!tryAgain){
+
     		window.setTimeout(function(){
 
     		context.clearRect(0,0,canvas.width, canvas.height);
@@ -527,7 +636,11 @@ function doneClicked(){
     			initializeClicked();
     			displaySentence();
     		}
-    	
+    		
+    		progMeter += 20;
+    		progressLayerRect(initial_x, initial_y, total_width, total_height, radius);
+			progressBarRect(initial_x, initial_y, progMeter, total_height, radius, total_width);
+			progressText(initial_x, initial_y, progMeter, total_height, radius, total_width);
     		buttonOff.onload();
     		
     		},1300);	
@@ -556,7 +669,6 @@ CanvasRenderingContext2D.prototype.roundRect = function(x, y, bx, by, color, r) 
     this.arc(x+r,y+r,r,r2d*180,r2d*270,false);
     this.closePath();
     this.strokeStyle = color;
-    this.font = "20pt sans-serif";
     this.stroke();
 };
 
@@ -602,11 +714,10 @@ function pickRandomSentence(random){
 		answers.adjectives = ["dark,", "hairy"];
 	}
 	sentence.picked[random] = true;
-
 	parseSentence();
 	initializeClicked();
 	calculateBegEnd();
-	displaySentence();
 	calculateWordWidths();
 	calculateWordPoints();
+	displaySentence();
 }

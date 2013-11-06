@@ -1,5 +1,6 @@
 var canvas = document.getElementById('myCanvas'), context = canvas.getContext('2d');
 
+
 // Create gradient
 var grd = context.createLinearGradient(0,0,960,0);
 grd.addColorStop(0,"Maroon");
@@ -24,25 +25,49 @@ errorMark.src = "../img/errorMark.png";
 
 var imd = null;
 
-/*
-context.beginPath();
-context.strokeStyle = '#99CC33';
-context.lineCap = 'square';
-context.closePath();
-context.fill();
-context.lineWidth = 10.0;
+var canvas2 = document.getElementById('canvas2'), context2 = canvas2.getContext('2d');
 
-imd = context.getImageData(0,0,240,240);
+var countdown = 60;
+var angle = 1.499999999;
+function startTimer(){
+	setInterval(
 
-function drawProgress(current) {
-    context.putImageData(imd, 0, 0);
-    context.beginPath();
-    context.arc(480, 170, 60, Math.PI / 2, 3 * Math.PI / current, true);
-    context.stroke();
+		function(){
+			context2.clearRect(0,0,canvas2.width, canvas2.height);
+			drawProgress(angle);
+			context2.font="40px Sans-Serif";
+			if(countdown == 60)
+				;
+			else if(countdown < 10)
+				context2.fillText(countdown,80,93);
+			else
+				context2.fillText(countdown,68,93);
+			--countdown;
+			if(countdown == -1)
+				alert("time has ran out");
+			if(angle == .0666666666)
+				angle = 0;
+
+	},1000);
 }
 
-drawProgress(2);
-*/
+startTimer();
+
+context2.beginPath();
+context2.strokeStyle = '#99CC33';
+context2.lineCap = 'square';
+context2.closePath();
+context2.fill();
+context2.lineWidth = 10.0;
+
+imd = context2.getImageData(0,0,240,240);
+function drawProgress(current) {
+    context2.putImageData(imd, 0, 0);
+    context2.beginPath();
+    context2.arc(90, 80, 60, 1.499999999 * Math.PI, Math.PI * current, true);
+    context2.stroke();
+    angle += .0333333333;
+}
 
 var progMeter = 0;
 var total_width = 300;

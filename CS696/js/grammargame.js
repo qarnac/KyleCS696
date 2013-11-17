@@ -1,5 +1,13 @@
 var canvas = document.getElementById('myCanvas'), context = canvas.getContext('2d');
 
+var progMeter = 0;
+var total_width = 300;
+var total_height = 34;
+var initial_x = 345;
+var initial_y = 150;
+var radius = total_height/2;
+
+var tryAgain = false;
 
 // Create gradient
 var grd = context.createLinearGradient(0,0,960,0);
@@ -23,35 +31,13 @@ checkMark.src = "../img/checkMark.png";
 var errorMark = new Image();
 errorMark.src = "../img/errorMark.png";
 
-var imd = null;
+var restartOff = new Image();
+restartOff.src = "../img/restartOff.png";
+
+var restartOn = new Image();
+restartOn.src = "../img/restartOn.png";
 
 var canvas2 = document.getElementById('canvas2'), context2 = canvas2.getContext('2d');
-
-var countdown = 60;
-var angle = 1.499999999;
-function startTimer(){
-	setInterval(
-
-		function(){
-			context2.clearRect(0,0,canvas2.width, canvas2.height);
-			drawProgress(angle);
-			context2.font="40px Sans-Serif";
-			if(countdown == 60)
-				;
-			else if(countdown < 10)
-				context2.fillText(countdown,80,93);
-			else
-				context2.fillText(countdown,68,93);
-			--countdown;
-			if(countdown == -1)
-				alert("time has ran out");
-			if(angle == .0666666666)
-				angle = 0;
-
-	},1000);
-}
-
-startTimer();
 
 context2.beginPath();
 context2.strokeStyle = '#99CC33';
@@ -60,7 +46,70 @@ context2.closePath();
 context2.fill();
 context2.lineWidth = 10.0;
 
+var imd = null;
 imd = context2.getImageData(0,0,240,240);
+
+var countdown, myVar, angle, totalScore = 0, totalCorrect = 0;
+
+progressLayerRect(initial_x, initial_y, total_width, total_height, radius);
+progressBarRect(initial_x, initial_y, progMeter, total_height, radius, total_width);
+progressText(initial_x, initial_y, progMeter);
+
+canvas.addEventListener('mousedown', mousedown);
+canvas.addEventListener('mousemove', movemouse); 
+
+startTimer();
+
+function startTimer(){
+
+	countdown = 60;
+	angle = 1.499999999;
+	context2.font="40px Sans-Serif";
+	context2.fillText(countdown,68,93);
+	drawProgress(angle);
+	--countdown;
+	start = setInterval(function(){
+       
+		drawProgress(angle);
+		if(angle == .0666666666)
+		angle = 0;
+		context2.font="40px Sans-Serif";
+		if(countdown < 10)
+			context2.fillText(countdown,80,93);
+		else
+			context2.fillText(countdown,68,93);
+		--countdown;
+		if(countdown == -1){
+			clearInterval(start);
+			context2.clearRect(0,0,canvas2.width, canvas2.height);
+			context.drawImage(errorMark,0,0,50,50,590,480,50,50);
+    		++sentence.problemCount;
+    		document.getElementById('fail').play();
+    		displayNextProblem();
+		}
+    },1000); // executes every 1000 milliseconds(i.e 1 sec)
+}
+
+//sentence object contains both the parsed words, widths, heights, starting points, and ending points
+var sentence = {words1:[""], words2:[""], wordwidths1:[], wordwidths2:[], clicked1:[], clicked2:[], picked:[],  
+	 		    startingPoint1xpos:[], startingPoint2xpos:[],
+	 		    endingPoint1xpos:[], endingPoint2xpos:[], 
+	 		    startingPoint1ypos:298, startingPoint2ypos:368,
+	 		    endingPoint1ypos:340, endingPoint2ypos: 410,
+	 		    startLine1:0, startLine2:0,
+	 		    line1: "", line2:"",
+	 		    correct: 0, answerWrong: false, problemCount: 1
+	 		};
+//answers object contains string arrays for each problem type
+var answers = {nouns:[""],verbs:[""],adjectives:[""]};
+
+for(var i = 0; i < 5; ++i){
+	sentence.picked[i] = false;
+}
+
+var random = getRandomInt(0, 4);
+pickRandomSentence(random);
+
 function drawProgress(current) {
     context2.putImageData(imd, 0, 0);
     context2.beginPath();
@@ -68,13 +117,6 @@ function drawProgress(current) {
     context2.stroke();
     angle += .0333333333;
 }
-
-var progMeter = 0;
-var total_width = 300;
-var total_height = 34;
-var initial_x = 345;
-var initial_y = 150;
-var radius = total_height/2;
 
 function rndRect(x, y, width, height, radius) {
     context.beginPath();
@@ -151,35 +193,9 @@ function progressText(x,y,width) {
     context.restore();
 }
 
-progressLayerRect(initial_x, initial_y, total_width, total_height, radius);
-progressBarRect(initial_x, initial_y, progMeter, total_height, radius, total_width);
-progressText(initial_x, initial_y, progMeter);
-
-//sentence object contains both the parsed words, widths, heights, starting points, and ending points
-var sentence = {words1:[""], words2:[""], wordwidths1:[], wordwidths2:[], clicked1:[], clicked2:[], picked:[],  
-	 		    startingPoint1xpos:[], startingPoint2xpos:[],
-	 		    endingPoint1xpos:[], endingPoint2xpos:[], 
-	 		    startingPoint1ypos:298, startingPoint2ypos:368,
-	 		    endingPoint1ypos:340, endingPoint2ypos: 410,
-	 		    startLine1:0, startLine2:0,
-	 		    line1: "", line2:"",
-	 		    correct: 0, answerWrong: false, problemCount: 1  
-	 		};
-//answers object contains string arrays for each problem type
-var answers = {nouns:[""],verbs:[""],adjectives:[""]};
-
-for(var i = 0; i < 5; ++i){
-	sentence.picked[i] = false;
-}
-
-var random = getRandomInt(0, 4);
-
 function getRandomInt (min, max) {
     return Math.floor(Math.random() * (max - min + 1)) + min;
-}
-
-pickRandomSentence(random);
-      
+}   
 /*
 	returns the mouse position of the cursor in the canvas
 */
@@ -191,12 +207,9 @@ function getMousePos(canvas, evt) {
           y: evt.clientY - rect.top
     };
 }
-
-canvas.addEventListener('mousemove', movemouse); 
-        /*
-          every instance of a cursor movement will cause this function to fire
-        */
-   
+/*
+    every instance of a cursor movement will cause this function to fire
+*/  
 function movemouse(evt){
 
 	var mousePos = getMousePos(canvas, evt);
@@ -219,7 +232,7 @@ function movemouse(evt){
            	context.roundRect(sentence.startingPoint2xpos[i], sentence.startingPoint2ypos, sentence.endingPoint2xpos[i], sentence.endingPoint2ypos, "white", 5);
     }
 
-    if(mousePos.x >= 450 && mousePos.x <= 531 && mousePos.y >= 480 && mousePos.y <= 528){
+    if(mousePos.x >= 440 && mousePos.x <= 521 && mousePos.y >= 480 && mousePos.y <= 528){
     	context.drawImage(buttonOn,0,0,81,48,440,480,81,48);
     }
     else
@@ -229,10 +242,6 @@ function movemouse(evt){
 	progressBarRect(initial_x, initial_y, progMeter, total_height, radius, total_width);
 	progressText(initial_x, initial_y, progMeter, total_height, radius, total_width);
 }
-
-var tryAgain = false;
-
-canvas.addEventListener('mousedown', mousedown); 
 /*
     fires whenever mouse is clicked 
 */
@@ -241,6 +250,7 @@ function mousedown(evt){
 	if(tryAgain){
 		context.clearRect(0,0,canvas.width, canvas.height);
     	displaySentence();
+    	displayScore();
     	buttonOff.onload();
 	}
 	tryAgain = false;
@@ -278,7 +288,7 @@ function mousedown(evt){
     	
     	doneClicked();
     }
-   
+
     progressLayerRect(initial_x, initial_y, total_width, total_height, radius);
 	progressBarRect(initial_x, initial_y, progMeter, total_height, radius, total_width);
 	progressText(initial_x, initial_y, progMeter, total_height, radius, total_width);
@@ -377,7 +387,6 @@ function calculateWordPoints(){
 			--j;
 			if(sentence.words1[j].charAt(sentence.words1[j].length - 1) == ',' || sentence.words1[j].charAt(sentence.words1[j].length - 1) == '.'){
 				sentence.startingPoint1xpos[i] += sentence.wordwidths1[j] + 22;
-				
 			}
 			else
 				sentence.startingPoint1xpos[i] += sentence.wordwidths1[j] + 11;
@@ -395,10 +404,8 @@ function calculateWordPoints(){
 		//add the widths of the previous words while adding additional widths for spaces, commas, and periods. 
 		while(j != 0){
 			--j;
-			if(sentence.words2[j].charAt(sentence.words2[j].length - 1) == ',' || sentence.words2[j].charAt(sentence.words2[j].length - 1) == '.'){
+			if(sentence.words2[j].charAt(sentence.words2[j].length - 1) == ',' || sentence.words2[j].charAt(sentence.words2[j].length - 1) == '.')
 				sentence.startingPoint2xpos[i] += sentence.wordwidths2[j] + 22;
-				
-			}
 			else
 				sentence.startingPoint2xpos[i] += sentence.wordwidths2[j] + 11;
  		}
@@ -604,7 +611,9 @@ function doneClicked(){
     		else{
     			context.drawImage(checkMark,0,0,50,50,590,483,50,50);
     			++sentence.problemCount;
+    			++totalCorrect;
     			document.getElementById('cash').play();
+    			displayPoints();
     		}
 		}
 		/*
@@ -633,24 +642,81 @@ function doneClicked(){
     	else{
     		context.drawImage(checkMark,0,0,50,50,590,483,50,50);
     		++sentence.problemCount;
+    		++totalCorrect;
     		document.getElementById('cash').play();
+    		displayPoints();
     	}
     	sentence.correct = 0;
 
     	/*
-    	If user is correct or incorrect then wipe canvas and display next problem after 1.3 seconds
+    	If user is correct or incorrect then display next problem
 		---------------------------------------------------------------------------------
 		*/	
-    	if(!tryAgain){
+    	if(!tryAgain)
+    		displayNextProblem();
+    	
+    	
+}
 
-    		window.setTimeout(function(){
+function displayPoints(){
 
-    		context.clearRect(0,0,canvas.width, canvas.height);
+	context.font="40px Sans-Serif";
+	context.fillStyle = 'darkGreen';
+	var tempScore = Math.floor(countdown/10) * 10;
+	if(tempScore >= 10){
+		context.fillText("+" + tempScore,650,520);
+		totalScore += tempScore;
+	}
+	else{
+		context.fillText("+" + 5,650,520);				
+		totalScore += 5;
+	}
+}
 
-    		if(sentence.problemCount == 16){
-    			alert("end of game");
-    		}
-    		else if(sentence.problemCount % 3 == 1){
+function displayScore(){
+
+	context.font="40px Sans-Serif";
+	context.fillStyle = '#99CC33';
+	context.fillText("Score: " + totalScore,0,100);
+}
+
+function displayNextProblem(){
+
+	clearInterval(start);
+	context2.clearRect(0,0,canvas2.width, canvas2.height);
+
+	canvas.removeEventListener('mousemove',movemouse);
+    canvas.removeEventListener('mousedown',mousedown);
+
+	window.setTimeout(function(){
+
+    	context.clearRect(0,0,canvas.width, canvas.height);
+
+    	if(sentence.problemCount == 16){
+
+    		canvas.addEventListener('mousemove', over);
+    		canvas.addEventListener('mousedown', down); 
+		
+			context.drawImage(restartOff,0,0,81,48,440,555,81,48);
+
+    		context.font="60px Sans-Serif";
+			context.fillStyle = '#99CC33';
+			context.fillText("Game Over",322,300);
+
+			context.font="50px Sans-Serif";
+			context.fillStyle = 'black';
+			if(totalScore < 100)
+				context.fillText("Total Score: " + totalScore, 317,400);
+			else
+				context.fillText("Total Score: " + totalScore, 300,400);
+			
+			if(totalCorrect < 10)
+				context.fillText("Questions Correct: " + totalCorrect + "/" + (sentence.problemCount-1),210,500);
+			else
+				context.fillText("Questions Correct: " + totalCorrect + "/" + (sentence.problemCount-1),196,500);
+    	}
+    	else{
+    		if(sentence.problemCount % 3 == 1){
     			var random = getRandomInt(0, 4);
     		
 				pickRandomSentence(random);
@@ -658,6 +724,7 @@ function doneClicked(){
     		else{
     			initializeClicked();
     			displaySentence();
+    			displayScore();
     		}
     		
     		progMeter += 20;
@@ -665,9 +732,12 @@ function doneClicked(){
 			progressBarRect(initial_x, initial_y, progMeter, total_height, radius, total_width);
 			progressText(initial_x, initial_y, progMeter, total_height, radius, total_width);
     		buttonOff.onload();
-    		
-    		},1300);	
+    		context2.clearRect(0,0,canvas2.width, canvas2.height);
+    		startTimer();
+    		canvas.addEventListener('mousemove', movemouse);
+    		canvas.addEventListener('mousedown', mousedown); 
     	}
+    },1300);
 }
 
 /*
@@ -743,4 +813,25 @@ function pickRandomSentence(random){
 	calculateWordWidths();
 	calculateWordPoints();
 	displaySentence();
+	displayScore();
 }
+
+function down(evt){
+
+	var mousePos = getMousePos(canvas, evt);
+	if(mousePos.x >= 440 && mousePos.x <= 521 && mousePos.y >= 555 && mousePos.y <= 603){
+		canvas.removeEventListener('mousemove',over);
+    	canvas.removeEventListener('mousedown',down);
+    	context.clearRect(0,0,canvas.width, canvas.height);
+    	window.location.reload();
+	}	
+}
+
+function over(evt){
+
+	var mousePos = getMousePos(canvas, evt);
+	if(mousePos.x >= 440 && mousePos.x <= 521 && mousePos.y >= 555 && mousePos.y <= 603)
+		context.drawImage(restartOn,0,0,81,48,440,555,81,48);
+	else
+		context.drawImage(restartOff,0,0,81,48,440,555,81,48);
+} 

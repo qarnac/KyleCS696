@@ -8,7 +8,6 @@ var initial_y = 150;
 var radius = total_height/2;
 
 var tryAgain = false;
-
 // Create gradient
 var grd = context.createLinearGradient(0,0,960,0);
 grd.addColorStop(0,"Maroon");
@@ -50,7 +49,6 @@ var imd = null;
 imd = context2.getImageData(0,0,240,240);
 
 var countdown, myVar, angle, totalScore = 0, totalCorrect = 0;
-
 progressLayerRect(initial_x, initial_y, total_width, total_height, radius);
 progressBarRect(initial_x, initial_y, progMeter, total_height, radius, total_width);
 progressText(initial_x, initial_y, progMeter);
@@ -61,7 +59,6 @@ canvas.addEventListener('mousemove', movemouse);
 startTimer();
 
 function startTimer(){
-
 	countdown = 60;
 	angle = 1.499999999;
 	context2.font="40px Sans-Serif";
@@ -89,7 +86,6 @@ function startTimer(){
 		}
     },1000); // executes every 1000 milliseconds(i.e 1 sec)
 }
-
 //sentence object contains both the parsed words, widths, heights, starting points, and ending points
 var sentence = {words1:[""], words2:[""], wordwidths1:[], wordwidths2:[], clicked1:[], clicked2:[], picked:[],  
 	 		    startingPoint1xpos:[], startingPoint2xpos:[],
@@ -98,7 +94,7 @@ var sentence = {words1:[""], words2:[""], wordwidths1:[], wordwidths2:[], clicke
 	 		    endingPoint1ypos:340, endingPoint2ypos: 410,
 	 		    startLine1:0, startLine2:0,
 	 		    line1: "", line2:"",
-	 		    correct: 0, answerWrong: false, problemCount: 1
+	 		    correct: 0, answerWrong: false, problemCount: 1, clickCount: 0
 	 		};
 //answers object contains string arrays for each problem type
 var answers = {nouns:[""],verbs:[""],adjectives:[""]};
@@ -131,11 +127,9 @@ function rndRect(x, y, width, height, radius) {
 
 function progressLayerRect(x, y, width, height, radius) {
     context.save();
- 
      // first grey layer
     context.fillStyle = 'rgba(189,189,189,1)';
     rndRect(x, y, width, height, radius);
- 
     // second layer with gradient
     var lingrad = context.createLinearGradient(0,y+height,0,0);
     lingrad.addColorStop(0, 'rgba(255,255,255, 0.1)');
@@ -143,7 +137,6 @@ function progressLayerRect(x, y, width, height, radius) {
     lingrad.addColorStop(1, 'rgba(255,255,255,0.4)');
     context.fillStyle = lingrad;
     rndRect(x, y, width, height, radius);
- 
     context.restore();
 }
 
@@ -196,41 +189,20 @@ function progressText(x,y,width) {
 function getRandomInt (min, max) {
     return Math.floor(Math.random() * (max - min + 1)) + min;
 }   
-/*
-	returns the mouse position of the cursor in the canvas
-*/
+//returns the mouse position of the cursor in the canvas
 function getMousePos(canvas, evt) {
-
      var rect = canvas.getBoundingClientRect();
      return {
           x: evt.clientX - rect.left,
           y: evt.clientY - rect.top
     };
 }
-/*
-    every instance of a cursor movement will cause this function to fire
-*/  
+//every instance of a cursor movement will cause this function to fire  
 function movemouse(evt){
-
 	var mousePos = getMousePos(canvas, evt);
   
-    for(var i = 0; i < sentence.words1.length; ++i){
-    	if(mousePos.x >= sentence.startingPoint1xpos[i] && mousePos.x <= sentence.endingPoint1xpos[i] && mousePos.y >= sentence.startingPoint1ypos && mousePos.y <= sentence.endingPoint1ypos && sentence.clicked1[i] == false)
-           	context.roundRect(sentence.startingPoint1xpos[i], sentence.startingPoint1ypos, sentence.endingPoint1xpos[i], sentence.endingPoint1ypos, "blue", 5);
-		else if(mousePos.x >= sentence.startingPoint1xpos[i] && mousePos.x <= sentence.endingPoint1xpos[i] && mousePos.y >= sentence.startingPoint1ypos && mousePos.y <= sentence.endingPoint1ypos || sentence.clicked1[i] == true)
-			context.roundRect(sentence.startingPoint1xpos[i], sentence.startingPoint1ypos, sentence.endingPoint1xpos[i], sentence.endingPoint1ypos, "red", 5);
-		else
-           	context.roundRect(sentence.startingPoint1xpos[i], sentence.startingPoint1ypos, sentence.endingPoint1xpos[i], sentence.endingPoint1ypos, "white", 5);	
-    }
-        
-    for(var i = 0; i < sentence.words2.length; ++i){
-        if(mousePos.x >= sentence.startingPoint2xpos[i] && mousePos.x <= sentence.endingPoint2xpos[i] && mousePos.y >= sentence.startingPoint2ypos && mousePos.y <= sentence.endingPoint2ypos && sentence.clicked2[i] == false)
-           	context.roundRect(sentence.startingPoint2xpos[i], sentence.startingPoint2ypos, sentence.endingPoint2xpos[i], sentence.endingPoint2ypos, "blue", 5);
-		else if(mousePos.x >= sentence.startingPoint2xpos[i] && mousePos.x <= sentence.endingPoint2xpos[i] && mousePos.y >= sentence.startingPoint2ypos && mousePos.y <= sentence.endingPoint2ypos || sentence.clicked2[i] == true)
-			context.roundRect(sentence.startingPoint2xpos[i], sentence.startingPoint2ypos, sentence.endingPoint2xpos[i], sentence.endingPoint2ypos, "red", 5);
-		else
-           	context.roundRect(sentence.startingPoint2xpos[i], sentence.startingPoint2ypos, sentence.endingPoint2xpos[i], sentence.endingPoint2ypos, "white", 5);
-    }
+    checkIfHovered(sentence.words1.length, mousePos, sentence.startingPoint1xpos, sentence.endingPoint1xpos, sentence.startingPoint1ypos, sentence.endingPoint1ypos, sentence.clicked1);
+    checkIfHovered(sentence.words2.length, mousePos, sentence.startingPoint2xpos, sentence.endingPoint2xpos, sentence.startingPoint2ypos, sentence.endingPoint2ypos, sentence.clicked2);
 
     if(mousePos.x >= 440 && mousePos.x <= 521 && mousePos.y >= 480 && mousePos.y <= 528){
     	context.drawImage(buttonOn,0,0,81,48,440,480,81,48);
@@ -242,11 +214,19 @@ function movemouse(evt){
 	progressBarRect(initial_x, initial_y, progMeter, total_height, radius, total_width);
 	progressText(initial_x, initial_y, progMeter, total_height, radius, total_width);
 }
-/*
-    fires whenever mouse is clicked 
-*/
-function mousedown(evt){
 
+function checkIfHovered(len, mousePos, startingPointX, endingPointX, startingPointY, endingPointY, clicked){
+    for(var i = 0; i < len; ++i){
+    	if(mousePos.x >= startingPointX[i] && mousePos.x <= endingPointX[i] && mousePos.y >= startingPointY && mousePos.y <= endingPointY && clicked[i] == false)
+           	context.roundRect(startingPointX[i], startingPointY, endingPointX[i], endingPointY, "blue", 5);
+		else if(mousePos.x >= startingPointX[i] && mousePos.x <= endingPointX[i] && mousePos.y >= startingPointY && mousePos.y <= endingPointY || clicked[i] == true)
+			context.roundRect(startingPointX[i], startingPointY, endingPointX[i], endingPointY, "red", 5);
+		else
+           	context.roundRect(startingPointX[i], startingPointY, endingPointX[i], endingPointY, "white", 5);	
+    }
+}
+//fires whenever mouse is clicked 
+function mousedown(evt){
 	if(tryAgain){
 		context.clearRect(0,0,canvas.width, canvas.height);
     	displaySentence();
@@ -256,55 +236,41 @@ function mousedown(evt){
 	tryAgain = false;
     var mousePos = getMousePos(canvas, evt);
             
-    for(var i = 0; i < sentence.words1.length; ++i){
+    checkMouseDown(sentence.words1.length, mousePos, sentence.startingPoint1xpos, sentence.endingPoint1xpos, sentence.startingPoint1ypos, sentence.endingPoint1ypos, sentence.clicked1);
+    checkMouseDown(sentence.words2.length, mousePos, sentence.startingPoint2xpos, sentence.endingPoint2xpos, sentence.startingPoint2ypos, sentence.endingPoint2ypos, sentence.clicked2);
 
-        if(mousePos.x >= sentence.startingPoint1xpos[i] && mousePos.x <= sentence.endingPoint1xpos[i] && mousePos.y >= sentence.startingPoint1ypos && mousePos.y <= sentence.endingPoint1ypos && sentence.clicked1[i] == true){ 			
-        	sentence.clicked1[i] = false;
-			context.roundRect(sentence.startingPoint1xpos[i], sentence.startingPoint1ypos, sentence.endingPoint1xpos[i], sentence.endingPoint1ypos, "white", 5);
-			document.getElementById('clickOut').play();
-        }
-        else if(mousePos.x >= sentence.startingPoint1xpos[i] && mousePos.x <= sentence.endingPoint1xpos[i] && mousePos.y >= sentence.startingPoint1ypos && mousePos.y <= sentence.endingPoint1ypos && sentence.clicked1[i] == false){
-            sentence.clicked1[i] = true;
-           	context.roundRect(sentence.startingPoint1xpos[i], sentence.startingPoint1ypos, sentence.endingPoint1xpos[i], sentence.endingPoint1ypos, "red", 5);
-           	document.getElementById('clickIn').play();
-        }
-    }
-
-    for(var i = 0; i < sentence.words2.length; ++i){
-
-        if(mousePos.x >= sentence.startingPoint2xpos[i] && mousePos.x <= sentence.endingPoint2xpos[i] && mousePos.y >= sentence.startingPoint2ypos && mousePos.y <= sentence.endingPoint2ypos && sentence.clicked2[i] == true){
-           	sentence.clicked2[i] = false;
-			context.roundRect(sentence.startingPoint2xpos[i], sentence.startingPoint2ypos, sentence.endingPoint2xpos[i], sentence.endingPoint2ypos, "white", 5);
-			document.getElementById('clickOut').play();
-        }
-        else if(mousePos.x >= sentence.startingPoint2xpos[i] && mousePos.x <= sentence.endingPoint2xpos[i] && mousePos.y >= sentence.startingPoint2ypos && mousePos.y <= sentence.endingPoint2ypos && sentence.clicked2[i] == false){
-           	sentence.clicked2[i] = true;
-           	context.roundRect(sentence.startingPoint2xpos[i], sentence.startingPoint2ypos, sentence.endingPoint2xpos[i], sentence.endingPoint2ypos, "red", 5);
-           	document.getElementById('clickIn').play();
-        }
-    }
-
-    if(mousePos.x >= 450 && mousePos.x <= 531 && mousePos.y >= 480 && mousePos.y <= 528){
-    	
+    if(mousePos.x >= 450 && mousePos.x <= 531 && mousePos.y >= 480 && mousePos.y <= 528)
     	doneClicked();
-    }
-
+    
     progressLayerRect(initial_x, initial_y, total_width, total_height, radius);
 	progressBarRect(initial_x, initial_y, progMeter, total_height, radius, total_width);
 	progressText(initial_x, initial_y, progMeter, total_height, radius, total_width);
+}
+
+function checkMouseDown(len, mousePos, startingPointX, endingPointX, startingPointY, endingPointY, clicked){
+	for(var i = 0; i < len; ++i){
+        if(mousePos.x >= startingPointX[i] && mousePos.x <= endingPointX[i] && mousePos.y >= startingPointY && mousePos.y <= endingPointY && clicked[i] == true){
+           	clicked[i] = false;
+			context.roundRect(startingPointX[i], startingPointY, endingPointX[i], endingPointY, "white", 5);
+			document.getElementById('clickOut').play();
+        }
+        else if(mousePos.x >= startingPointX[i] && mousePos.x <= endingPointX[i] && mousePos.y >= startingPointY && mousePos.y <= endingPointY && clicked[i] == false){
+           	clicked[i] = true;
+           	context.roundRect(startingPointX[i], startingPointY, endingPointX[i], endingPointY, "red", 5);
+           	document.getElementById('clickIn').play();
+        }
+    }
 }
 
 /*
 Helper functions
 --------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 */
-
 //initializes the words arrays by parsing the sentence
 function parseSentence(){
 	sentence.words1 = sentence.line1.split(" ");
 	sentence.words2 = sentence.line2.split(" ");	
 }	
-
 //calculates the starting point of line1 and line2
 function calculateBegEnd(){
 	sentence.startLine1 = measureText(sentence.line1, 40, 'Arial').width;
@@ -312,7 +278,6 @@ function calculateBegEnd(){
 	sentence.startLine2 = measureText(sentence.line2, 40, 'Arial').width;
 	sentence.startLine2 = (960 - sentence.startLine2) / 2;
 }
-
 //displays the sentence on screen
 function displaySentence(){
 	context.font = "40px Arial";
@@ -348,79 +313,35 @@ function displaySentence(){
 }
 
 function initializeClicked(){
-
 	for(var i = 0; i < sentence.words1.length; ++i)
 		sentence.clicked1[i] = false;
-	
 	for(var i = 0; i < sentence.words2.length; ++i)
 		sentence.clicked2[i] = false;
 }
 
-//calculates the widths of each word in the line1 and line2, removes commas and periods from the widths 
-function calculateWordWidths(){
-	for(var i = 0; i < sentence.words1.length; ++i){
-		sentence.wordwidths1[i] = measureText(sentence.words1[i], 40, 'Arial').width;
-		var tempWord = sentence.words1[i];
-		var len = sentence.words1[i].length;
-		if(tempWord[len - 1] == ',' || tempWord[len - 1] == '.')
-			sentence.wordwidths1[i] -= 11;
-		sentence.startingPoint1xpos[i] = 0;
-	}
-
-	for(var i = 0; i < sentence.words2.length; ++i){
-		sentence.wordwidths2[i] = measureText(sentence.words2[i], 40, 'Arial').width;
-		var tempWord = sentence.words2[i];
-		var len = sentence.words2[i].length;
-		if(tempWord[len - 1] == ',' || tempWord[len - 1] == '.')
-			sentence.wordwidths2[i] -= 11;
-		sentence.startingPoint2xpos[i] = 0;
+function wordWidthsAndPoints(){
+	calculateWordWidthsAndPoints(sentence.words1.length, sentence.startingPoint1xpos, sentence.endingPoint1xpos, sentence.startLine1, sentence.wordwidths1, sentence.words1);
+	calculateWordWidthsAndPoints(sentence.words2.length, sentence.startingPoint2xpos, sentence.endingPoint2xpos, sentence.startLine2, sentence.wordwidths2, sentence.words2);
+}
+//calculates the widths of each word in the line1 and line2 and the starting points, removes commas and periods from the widths 
+function calculateWordWidthsAndPoints(len, startingPoint, endingPoint, startLine, wordwidth, words){
+	var currentPoint = startLine;
+	for(var i = 0; i < len; ++i){
+		wordwidth[i] = measureText(words[i], 40, 'Arial').width;
+		startingPoint[i] = currentPoint - 2;
+		if(words[i].charAt(words[i].length - 1) == ',' || words[i].charAt(words[i].length - 1) == '.'){
+			wordwidth[i] -= 11;
+			currentPoint += wordwidth[i] + 22;
+		}
+		else
+			currentPoint += wordwidth[i] + 11;
+		endingPoint[i] = startingPoint[i] + wordwidth[i] + 4;
 	}
 }
-
-//calculates the starting and ending points for the words in line1
-function calculateWordPoints(){
-	for(var i = 0; i < sentence.words1.length; ++i){
-
-		var j = i;
-		//add the widths of the previous words while adding additional widths for spaces, commas, and periods. 
-		while(j != 0){
-			--j;
-			if(sentence.words1[j].charAt(sentence.words1[j].length - 1) == ',' || sentence.words1[j].charAt(sentence.words1[j].length - 1) == '.'){
-				sentence.startingPoint1xpos[i] += sentence.wordwidths1[j] + 22;
-			}
-			else
-				sentence.startingPoint1xpos[i] += sentence.wordwidths1[j] + 11;
- 		}
-		//add the space between the left boundary and the 1st word to get the final starting point of the current word in the sentence
-		sentence.startingPoint1xpos[i] += sentence.startLine1 - 2;
-		//ending point is the starting point plus the width of the current word
-		sentence.endingPoint1xpos[i] = sentence.startingPoint1xpos[i] + sentence.wordwidths1[i] + 4;
-	}
-
-	//calculates the starting and ending points for the words in line2
-	for(var i = 0; i < sentence.words2.length; ++i){
-
-		var j = i;
-		//add the widths of the previous words while adding additional widths for spaces, commas, and periods. 
-		while(j != 0){
-			--j;
-			if(sentence.words2[j].charAt(sentence.words2[j].length - 1) == ',' || sentence.words2[j].charAt(sentence.words2[j].length - 1) == '.')
-				sentence.startingPoint2xpos[i] += sentence.wordwidths2[j] + 22;
-			else
-				sentence.startingPoint2xpos[i] += sentence.wordwidths2[j] + 11;
- 		}
-		//add the space between the left boundary and the 1st word to get the final starting point of the current word in the sentence
-		sentence.startingPoint2xpos[i] += sentence.startLine2 - 2;
-		//ending point is the starting point plus the width of the current word
-		sentence.endingPoint2xpos[i] = sentence.startingPoint2xpos[i] + sentence.wordwidths2[i] + 4;
-	}
-}
-
 //function returns an object containing the width and height of the passed in text
 function measureText(pText, pFontSize, pStyle) {
 
     var lDiv = document.createElement('lDiv');
-
     document.body.appendChild(lDiv);
 
     if (pStyle != null) {
@@ -437,229 +358,112 @@ function measureText(pText, pFontSize, pStyle) {
         width: lDiv.clientWidth,
         height: lDiv.clientHeight
     };
-
     document.body.removeChild(lDiv);
     lDiv = null;
-
     return lResult;
+}
+
+function checkAnswers(wordLen, clicked, posLen, words, pos){
+
+	for(var i = 0; i < wordLen; ++i){
+		if(clicked[i] == true){
+			var tempCount = 0;
+			for(var j = 0; j < posLen; ++j){
+				if(words[i] == pos[j]){
+					++tempCount;
+					++sentence.correct;
+				}
+			}
+			if(tempCount == 0)
+				sentence.answerWrong = true;	
+		}
+	}
+}
+
+function checkIfClicked(len, clicked){
+	for(var i = 0; i < len; ++i){
+		if(clicked[i]){
+			++sentence.clickCount;
+			break;
+		}
+	}	
 }
 
 function doneClicked(){
 
 		sentence.answerWrong = false;
-
 		//nouns
 		if(sentence.problemCount % 3 == 1){
-
-			for(var i = 0; i < sentence.words1.length; ++i){
-
-				if(sentence.clicked1[i] == true){
-					var tempCount = 0;
-					for(var j = 0; j < answers.nouns.length; ++j){
-
-						if(sentence.words1[i] == answers.nouns[j]){
-							++tempCount;
-							++sentence.correct;
-						}
-					}
-
-					if(tempCount == 0){
-						sentence.answerWrong = true;	
-					}
-				}
-			}
-
-			for(var i = 0; i < sentence.words2.length; ++i){
-
-				if(sentence.clicked2[i] == true){
-					var tempCount = 0;
-					for(var j = 0; j < answers.nouns.length; ++j){
-
-						if(sentence.words2[i] == answers.nouns[j]){
-							++tempCount;
-							++sentence.correct;
-						}
-					}
-
-					if(tempCount == 0){
-						sentence.answerWrong = true;
-					}
-				}
-			}
+			checkAnswers(sentence.words1.length, sentence.clicked1, answers.nouns.length, sentence.words1, answers.nouns);
+			checkAnswers(sentence.words2.length, sentence.clicked2, answers.nouns.length, sentence.words2, answers.nouns);
 		}
 		//verbs
 		else if(sentence.problemCount % 3 == 2){
-
-			for(var i = 0; i < sentence.words1.length; ++i){
-
-				if(sentence.clicked1[i] == true){
-					var tempCount = 0;
-					for(var j = 0; j < answers.verbs.length; ++j){
-
-						if(sentence.words1[i] == answers.verbs[j]){
-							++tempCount;
-							++sentence.correct;
-						}
-					}
-
-					if(tempCount == 0){
-						sentence.answerWrong = true;
-					}
-				}
-			}
-
-			for(var i = 0; i < sentence.words2.length; ++i){
-
-				if(sentence.clicked2[i] == true){
-					var tempCount = 0;
-					for(var j = 0; j < answers.verbs.length; ++j){
-
-						if(sentence.words2[i] == answers.verbs[j]){
-							++tempCount;
-							++sentence.correct;
-						}
-					}
-
-					if(tempCount == 0){
-						sentence.answerWrong = true;	
-					}
-				}
-			}
+			checkAnswers(sentence.words1.length, sentence.clicked1, answers.verbs.length, sentence.words1, answers.verbs);
+			checkAnswers(sentence.words2.length, sentence.clicked2, answers.verbs.length, sentence.words2, answers.verbs);
 		}
 		//adjectives
 		else{
-
-			for(var i = 0; i < sentence.words1.length; ++i){
-
-				if(sentence.clicked1[i] == true){
-					var tempCount = 0;
-					for(var j = 0; j < answers.adjectives.length; ++j){
-
-						if(sentence.words1[i] == answers.adjectives[j]){
-							++tempCount;
-							++sentence.correct;
-						}
-					}
-
-					if(tempCount == 0){
-						sentence.answerWrong = true;	
-					}
-				}
-			}
-
-			for(var i = 0; i < sentence.words2.length; ++i){
-
-				if(sentence.clicked2[i] == true){
-					var tempCount = 0;
-					for(var j = 0; j < answers.adjectives.length; ++j){
-
-						if(sentence.words2[i] == answers.adjectives[j]){
-							++tempCount;
-							++sentence.correct;
-						}
-					}
-
-					if(tempCount == 0){
-						sentence.answerWrong = true;
-					}
-				}
-			}
-		}
-		
-		var clickCount = 0;
-		/*
-		Determines if there are no words clicked, then display try again message
-		---------------------------------------------------------------------------------
-		*/
-		for(var i = 0; i < sentence.words1.length; ++i){
-			if(sentence.clicked1[i]){
-				++clickCount;
-				break;
-			}
-		}
-		for(var i = 0; i < sentence.words2.length; ++i){
-			if(sentence.clicked2[i]){
-				++clickCount;
-				break;
-			}
+			checkAnswers(sentence.words1.length, sentence.clicked1, answers.adjectives.length, sentence.words1, answers.adjectives);
+			checkAnswers(sentence.words2.length, sentence.clicked2, answers.adjectives.length, sentence.words2, answers.adjectives);
 		}
 
-		if(clickCount == 0){
-
-			context.font = "20px Arial";
-			context.fillStyle = 'darkRed';
+		checkIfClicked(sentence.words1.length, sentence.clicked1);
+		checkIfClicked(sentence.words2.length, sentence.clicked2);
+		context.font = "20px Arial";
+		context.fillStyle = 'darkRed';
+		//Determines if there are no words clicked, then display try again message
+		if(sentence.clickCount == 0){
 			context.fillText("No words selected, try again!", 351, 580);
 			tryAgain = true;
 		}
-		/*
-		For adjective problems
-		---------------------------------------------------------------------------------
-		*/
+		//For adjective problems
 		else if(sentence.problemCount % 3 == 0){
-
 			if(!sentence.answerWrong && sentence.correct == 1){
-				context.font = "20px Arial";
-				context.fillStyle = 'darkRed';
 				context.fillText("Select one more adjective!", 363.5, 580);
 				tryAgain = true;
 			}
-			else if(sentence.answerWrong || sentence.correct < 2){
-				context.drawImage(errorMark,0,0,50,50,590,480,50,50);
-				++sentence.problemCount;
-				document.getElementById('fail').play();
-			}
-    		else{
-    			context.drawImage(checkMark,0,0,50,50,590,483,50,50);
-    			++sentence.problemCount;
-    			++totalCorrect;
-    			document.getElementById('cash').play();
-    			displayPoints();
-    		}
+			else if(sentence.answerWrong || sentence.correct < 2)
+				incorrect();
+    		else
+    			correct();
 		}
-		/*
-		For noun and verb problems
-		---------------------------------------------------------------------------------
-		*/
+		//For noun and verb problems
     	else if(!sentence.answerWrong && sentence.correct == 1) {
-    		context.font = "20px Arial";
-			context.fillStyle = 'darkRed';
 			context.fillText("One correct, select two more!", 351, 580);
 			tryAgain = true;
     	}
     	else if(!sentence.answerWrong && sentence.correct == 2) {
-    		context.font = "20px Arial";
-			context.fillStyle = 'darkRed';
 			context.fillText("Two correct, select one more!", 351, 580);
 			tryAgain = true;
     	}
-    	//an incorrect word is clicked, display error png
-    	else if(sentence.answerWrong || sentence.correct < 3){
-    		context.drawImage(errorMark,0,0,50,50,590,480,50,50);
-    		++sentence.problemCount;
-    		document.getElementById('fail').play();
-    	}
-    	//enough correct answers clicked, display checkMark png
-    	else{
-    		context.drawImage(checkMark,0,0,50,50,590,483,50,50);
-    		++sentence.problemCount;
-    		++totalCorrect;
-    		document.getElementById('cash').play();
-    		displayPoints();
-    	}
+    	else if(sentence.answerWrong || sentence.correct < 3)
+    		incorrect();
+    	else
+    		correct();
     	sentence.correct = 0;
+    	sentence.clickCount = 0;
 
-    	/*
-    	If user is correct or incorrect then display next problem
-		---------------------------------------------------------------------------------
-		*/	
+    	//If user is correct or incorrect then display next problem
     	if(!tryAgain)
-    		displayNextProblem();
-    	
-    	
+    		displayNextProblem(); 	
+}
+
+function incorrect(){
+	context.drawImage(errorMark,0,0,50,50,590,480,50,50);
+	++sentence.problemCount;
+	document.getElementById('fail').play();
+}
+
+function correct(){
+	context.drawImage(checkMark,0,0,50,50,590,483,50,50);
+    ++sentence.problemCount;
+    ++totalCorrect;
+    document.getElementById('cash').play();
+    displayPoints();
 }
 
 function displayPoints(){
-
 	context.font="40px Sans-Serif";
 	context.fillStyle = 'darkGreen';
 	var tempScore = Math.floor(countdown/10) * 10;
@@ -674,17 +478,14 @@ function displayPoints(){
 }
 
 function displayScore(){
-
 	context.font="40px Sans-Serif";
 	context.fillStyle = '#99CC33';
 	context.fillText("Score: " + totalScore,0,100);
 }
 
 function displayNextProblem(){
-
 	clearInterval(start);
 	context2.clearRect(0,0,canvas2.width, canvas2.height);
-
 	canvas.removeEventListener('mousemove',movemouse);
     canvas.removeEventListener('mousedown',mousedown);
 
@@ -718,7 +519,6 @@ function displayNextProblem(){
     	else{
     		if(sentence.problemCount % 3 == 1){
     			var random = getRandomInt(0, 4);
-    		
 				pickRandomSentence(random);
     		}
     		else{
@@ -739,7 +539,6 @@ function displayNextProblem(){
     	}
     },1300);
 }
-
 /*
     gives rounded corners to drawn rectangles
     x and y are the starting points for the top left of the passed in rectangle
@@ -767,9 +566,8 @@ CanvasRenderingContext2D.prototype.roundRect = function(x, y, bx, by, color, r) 
 
 function pickRandomSentence(random){
 
-	while(sentence.picked[random] == true){
+	while(sentence.picked[random] == true)
 		random = getRandomInt(0, 4);
-	}
 	//initialize the lines for the sentence
 	if(random == 0){
 		sentence.line1 = "Once the shiny gates opened, Jimmy ran to wait in";
@@ -810,14 +608,12 @@ function pickRandomSentence(random){
 	parseSentence();
 	initializeClicked();
 	calculateBegEnd();
-	calculateWordWidths();
-	calculateWordPoints();
+	wordWidthsAndPoints();
 	displaySentence();
 	displayScore();
 }
 
 function down(evt){
-
 	var mousePos = getMousePos(canvas, evt);
 	if(mousePos.x >= 440 && mousePos.x <= 521 && mousePos.y >= 555 && mousePos.y <= 603){
 		canvas.removeEventListener('mousemove',over);
@@ -828,7 +624,6 @@ function down(evt){
 }
 
 function over(evt){
-
 	var mousePos = getMousePos(canvas, evt);
 	if(mousePos.x >= 440 && mousePos.x <= 521 && mousePos.y >= 555 && mousePos.y <= 603)
 		context.drawImage(restartOn,0,0,81,48,440,555,81,48);

@@ -57,7 +57,7 @@ canvas.addEventListener('mousedown', mousedown);
 canvas.addEventListener('mousemove', movemouse); 
 
 startTimer();
-
+//begin the countdown timer...60 second duration
 function startTimer(){
 	countdown = 60;
 	angle = 1.499999999;
@@ -99,13 +99,12 @@ var sentence = {words1:[""], words2:[""], wordwidths1:[], wordwidths2:[], clicke
 //answers object contains string arrays for each problem type
 var answers = {nouns:[""],verbs:[""],adjectives:[""]};
 
-for(var i = 0; i < 5; ++i){
+for(var i = 0; i < 5; ++i)
 	sentence.picked[i] = false;
-}
 
 var random = getRandomInt(0, 4);
 pickRandomSentence(random);
-
+//draw the entire progress bar
 function drawProgress(current) {
     context2.putImageData(imd, 0, 0);
     context2.beginPath();
@@ -113,7 +112,7 @@ function drawProgress(current) {
     context2.stroke();
     angle += .0333333333;
 }
-
+//provide round rectangles to the progress bar
 function rndRect(x, y, width, height, radius) {
     context.beginPath();
     context.moveTo(x + radius, y);
@@ -124,7 +123,7 @@ function rndRect(x, y, width, height, radius) {
     context.closePath();
     context.fill();
 }
-
+//provide different colored layers in the progress bar 
 function progressLayerRect(x, y, width, height, radius) {
     context.save();
      // first grey layer
@@ -139,7 +138,7 @@ function progressLayerRect(x, y, width, height, radius) {
     rndRect(x, y, width, height, radius);
     context.restore();
 }
-
+//draw the progress within the progress bar
 function progressBarRect(x, y, width, height, radius, max) {
     // deplacement for chord drawing
     var offset = 0;
@@ -175,7 +174,7 @@ function progressBarRect(x, y, width, height, radius, max) {
     context.fillStyle = 'green';
     context.fill();  
 }
-
+//draw the % completed in the progress bar
 function progressText(x,y,width) {
     context.save();
     context.fillStyle = 'white';
@@ -185,7 +184,7 @@ function progressText(x,y,width) {
     context.fillText(text, initial_x+14, y+25);
     context.restore();
 }
-
+//returns a random integer between two passed in integers
 function getRandomInt (min, max) {
     return Math.floor(Math.random() * (max - min + 1)) + min;
 }   
@@ -214,7 +213,7 @@ function movemouse(evt){
 	progressBarRect(initial_x, initial_y, progMeter, total_height, radius, total_width);
 	progressText(initial_x, initial_y, progMeter, total_height, radius, total_width);
 }
-
+//check if the words are hovered by the mouse cursor
 function checkIfHovered(len, mousePos, startingPointX, endingPointX, startingPointY, endingPointY, clicked){
     for(var i = 0; i < len; ++i){
     	if(mousePos.x >= startingPointX[i] && mousePos.x <= endingPointX[i] && mousePos.y >= startingPointY && mousePos.y <= endingPointY && clicked[i] == false)
@@ -246,7 +245,7 @@ function mousedown(evt){
 	progressBarRect(initial_x, initial_y, progMeter, total_height, radius, total_width);
 	progressText(initial_x, initial_y, progMeter, total_height, radius, total_width);
 }
-
+//check if a word has been clicked in the sentence
 function checkMouseDown(len, mousePos, startingPointX, endingPointX, startingPointY, endingPointY, clicked){
 	for(var i = 0; i < len; ++i){
         if(mousePos.x >= startingPointX[i] && mousePos.x <= endingPointX[i] && mousePos.y >= startingPointY && mousePos.y <= endingPointY && clicked[i] == true){
@@ -261,11 +260,6 @@ function checkMouseDown(len, mousePos, startingPointX, endingPointX, startingPoi
         }
     }
 }
-
-/*
-Helper functions
---------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-*/
 //initializes the words arrays by parsing the sentence
 function parseSentence(){
 	sentence.words1 = sentence.line1.split(" ");
@@ -311,14 +305,14 @@ function displaySentence(){
 		context.fillText(problem, 226, 50);
 	}
 }
-
+//initialize each word in the sentence as not being clicked to begin each problem
 function initializeClicked(){
 	for(var i = 0; i < sentence.words1.length; ++i)
 		sentence.clicked1[i] = false;
 	for(var i = 0; i < sentence.words2.length; ++i)
 		sentence.clicked2[i] = false;
 }
-
+//passes information for each line to calculate the word widths and starting points
 function wordWidthsAndPoints(){
 	calculateWordWidthsAndPoints(sentence.words1.length, sentence.startingPoint1xpos, sentence.endingPoint1xpos, sentence.startLine1, sentence.wordwidths1, sentence.words1);
 	calculateWordWidthsAndPoints(sentence.words2.length, sentence.startingPoint2xpos, sentence.endingPoint2xpos, sentence.startLine2, sentence.wordwidths2, sentence.words2);
@@ -340,7 +334,6 @@ function calculateWordWidthsAndPoints(len, startingPoint, endingPoint, startLine
 }
 //function returns an object containing the width and height of the passed in text
 function measureText(pText, pFontSize, pStyle) {
-
     var lDiv = document.createElement('lDiv');
     document.body.appendChild(lDiv);
 
@@ -362,9 +355,8 @@ function measureText(pText, pFontSize, pStyle) {
     lDiv = null;
     return lResult;
 }
-
+//checks if the words selected are correct for that specific problem
 function checkAnswers(wordLen, clicked, posLen, words, pos){
-
 	for(var i = 0; i < wordLen; ++i){
 		if(clicked[i] == true){
 			var tempCount = 0;
@@ -379,7 +371,7 @@ function checkAnswers(wordLen, clicked, posLen, words, pos){
 		}
 	}
 }
-
+//totals the number of clicked words per line
 function checkIfClicked(len, clicked){
 	for(var i = 0; i < len; ++i){
 		if(clicked[i]){
@@ -388,73 +380,72 @@ function checkIfClicked(len, clicked){
 		}
 	}	
 }
-
+//once user presses the done button perform various checks in order to advance to next problem
 function doneClicked(){
+	sentence.answerWrong = false;
+	//nouns
+	if(sentence.problemCount % 3 == 1){
+		checkAnswers(sentence.words1.length, sentence.clicked1, answers.nouns.length, sentence.words1, answers.nouns);
+		checkAnswers(sentence.words2.length, sentence.clicked2, answers.nouns.length, sentence.words2, answers.nouns);
+	}
+	//verbs
+	else if(sentence.problemCount % 3 == 2){
+		checkAnswers(sentence.words1.length, sentence.clicked1, answers.verbs.length, sentence.words1, answers.verbs);
+		checkAnswers(sentence.words2.length, sentence.clicked2, answers.verbs.length, sentence.words2, answers.verbs);
+	}
+	//adjectives
+	else{
+		checkAnswers(sentence.words1.length, sentence.clicked1, answers.adjectives.length, sentence.words1, answers.adjectives);
+		checkAnswers(sentence.words2.length, sentence.clicked2, answers.adjectives.length, sentence.words2, answers.adjectives);
+	}
 
-		sentence.answerWrong = false;
-		//nouns
-		if(sentence.problemCount % 3 == 1){
-			checkAnswers(sentence.words1.length, sentence.clicked1, answers.nouns.length, sentence.words1, answers.nouns);
-			checkAnswers(sentence.words2.length, sentence.clicked2, answers.nouns.length, sentence.words2, answers.nouns);
-		}
-		//verbs
-		else if(sentence.problemCount % 3 == 2){
-			checkAnswers(sentence.words1.length, sentence.clicked1, answers.verbs.length, sentence.words1, answers.verbs);
-			checkAnswers(sentence.words2.length, sentence.clicked2, answers.verbs.length, sentence.words2, answers.verbs);
-		}
-		//adjectives
-		else{
-			checkAnswers(sentence.words1.length, sentence.clicked1, answers.adjectives.length, sentence.words1, answers.adjectives);
-			checkAnswers(sentence.words2.length, sentence.clicked2, answers.adjectives.length, sentence.words2, answers.adjectives);
-		}
-
-		checkIfClicked(sentence.words1.length, sentence.clicked1);
-		checkIfClicked(sentence.words2.length, sentence.clicked2);
-		context.font = "20px Arial";
-		context.fillStyle = 'darkRed';
-		//Determines if there are no words clicked, then display try again message
-		if(sentence.clickCount == 0){
-			context.fillText("No words selected, try again!", 351, 580);
+	checkIfClicked(sentence.words1.length, sentence.clicked1);
+	checkIfClicked(sentence.words2.length, sentence.clicked2);
+	context.font = "20px Arial";
+	context.fillStyle = 'darkRed';
+	//Determines if there are no words clicked, then display try again message
+	if(sentence.clickCount == 0){
+		context.fillText("No words selected, try again!", 351, 580);
+		tryAgain = true;
+	}
+	//For adjective problems
+	else if(sentence.problemCount % 3 == 0){
+		if(!sentence.answerWrong && sentence.correct == 1){
+			context.fillText("Select one more adjective!", 363.5, 580);
 			tryAgain = true;
 		}
-		//For adjective problems
-		else if(sentence.problemCount % 3 == 0){
-			if(!sentence.answerWrong && sentence.correct == 1){
-				context.fillText("Select one more adjective!", 363.5, 580);
-				tryAgain = true;
-			}
-			else if(sentence.answerWrong || sentence.correct < 2)
-				incorrect();
-    		else
-    			correct();
-		}
-		//For noun and verb problems
-    	else if(!sentence.answerWrong && sentence.correct == 1) {
-			context.fillText("One correct, select two more!", 351, 580);
-			tryAgain = true;
-    	}
-    	else if(!sentence.answerWrong && sentence.correct == 2) {
-			context.fillText("Two correct, select one more!", 351, 580);
-			tryAgain = true;
-    	}
-    	else if(sentence.answerWrong || sentence.correct < 3)
-    		incorrect();
+		else if(sentence.answerWrong || sentence.correct < 2)
+			incorrect();
     	else
     		correct();
-    	sentence.correct = 0;
-    	sentence.clickCount = 0;
+	}
+	//For noun and verb problems
+    else if(!sentence.answerWrong && sentence.correct == 1) {
+		context.fillText("One correct, select two more!", 351, 580);
+		tryAgain = true;
+    }
+    else if(!sentence.answerWrong && sentence.correct == 2) {
+		context.fillText("Two correct, select one more!", 351, 580);
+		tryAgain = true;
+    }
+    else if(sentence.answerWrong || sentence.correct < 3)
+    	incorrect();
+    else
+    	correct();
+    sentence.correct = 0;
+    sentence.clickCount = 0;
 
-    	//If user is correct or incorrect then display next problem
-    	if(!tryAgain)
-    		displayNextProblem(); 	
+    //If user is correct or incorrect then display next problem
+    if(!tryAgain)
+    	displayNextProblem(); 	
 }
-
+//user is incorrect
 function incorrect(){
 	context.drawImage(errorMark,0,0,50,50,590,480,50,50);
 	++sentence.problemCount;
 	document.getElementById('fail').play();
 }
-
+//user is correct
 function correct(){
 	context.drawImage(checkMark,0,0,50,50,590,483,50,50);
     ++sentence.problemCount;
@@ -462,7 +453,7 @@ function correct(){
     document.getElementById('cash').play();
     displayPoints();
 }
-
+//display the points awarded after each correct answer
 function displayPoints(){
 	context.font="40px Sans-Serif";
 	context.fillStyle = 'darkGreen';
@@ -476,13 +467,13 @@ function displayPoints(){
 		totalScore += 5;
 	}
 }
-
+//display the total score in upper left corner
 function displayScore(){
 	context.font="40px Sans-Serif";
 	context.fillStyle = '#99CC33';
 	context.fillText("Score: " + totalScore,0,100);
 }
-
+//display the next problem after 1300 ms delay to provide the user feedback
 function displayNextProblem(){
 	clearInterval(start);
 	context2.clearRect(0,0,canvas2.width, canvas2.height);
@@ -563,7 +554,7 @@ CanvasRenderingContext2D.prototype.roundRect = function(x, y, bx, by, color, r) 
     this.strokeStyle = color;
     this.stroke();
 };
-
+//a sentence is randomly chosen for each problem; no duplicated problems throughout the game
 function pickRandomSentence(random){
 
 	while(sentence.picked[random] == true)
@@ -612,7 +603,7 @@ function pickRandomSentence(random){
 	displaySentence();
 	displayScore();
 }
-
+//checks if the user has clicked the restart button
 function down(evt){
 	var mousePos = getMousePos(canvas, evt);
 	if(mousePos.x >= 440 && mousePos.x <= 521 && mousePos.y >= 555 && mousePos.y <= 603){
@@ -622,7 +613,7 @@ function down(evt){
     	window.location.reload();
 	}	
 }
-
+//checks if the user has move their mouse cursor over the restart button
 function over(evt){
 	var mousePos = getMousePos(canvas, evt);
 	if(mousePos.x >= 440 && mousePos.x <= 521 && mousePos.y >= 555 && mousePos.y <= 603)

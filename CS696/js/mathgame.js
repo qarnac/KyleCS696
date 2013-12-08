@@ -47,6 +47,8 @@ function begin(){
 
     var restartGame = {left:240,right:720,top:380,bottom:480};
     var newLevel = {left:240,right:720,top:520,bottom:620};
+    var pixels = {sixthree:63,sixfour:64,sixfive:65,onetwoeight:128,oneninetwo:192,boardWidth:960,boardHeight:768};
+
     //return true of false if the mouse has clicked or hovered over the passed in level
     function clickedOrHover(mousePos,level){
         if(mousePos.x >= level.left && mousePos.x <= level.right && mousePos.y >= level.top && mousePos.y <= level.bottom)
@@ -125,9 +127,9 @@ function begin(){
     };
     //begin the math game
     function runGame(){
-        var muncher = {image:new Image(),xpos:0,ypos:0,cxpos:448,cypos:320,prevx:0,prevy:0,direction:"right",framesize:64};
-        var enemy = {image:new Image(),xpos:0,ypos:0,cxpos:0,cypos:704,prevx:0,prevy:0,direction:"right",prevDirection:"right",framesize:64};
-        var gameboard = {framesize:64};
+        var muncher = {image:new Image(),xpos:0,ypos:0,cxpos:448,cypos:320,prevx:0,prevy:0,direction:"right",framesize:pixels.sixfour};
+        var enemy = {image:new Image(),xpos:0,ypos:0,cxpos:0,cypos:704,prevx:0,prevy:0,direction:"right",prevDirection:"right",framesize:pixels.sixfour};
+        var gameboard = {framesize:pixels.sixfour};
 
         context.clearRect(0,0,canvas.width, canvas.height);
 
@@ -165,8 +167,8 @@ function begin(){
         }
         //position each answer on the gameboard in terms of its pixel location
         function convertMovesToPixels(answer){
-            answer.x = (64 * answer.x) + 1;
-            answer.y = (64 * answer.y) + 1;
+            answer.x = (pixels.sixfour * answer.x) + 1;
+            answer.y = (pixels.sixfour * answer.y) + 1;
             answer.bx = answer.x + 62;
             answer.by = answer.y + 62;
         }
@@ -181,33 +183,48 @@ function begin(){
             convertMovesToPixels(answer2);
             convertMovesToPixels(answer3);
             convertMovesToPixels(answer4);
-
-            while((muncher.cxpos == answer1.x + 63 || muncher.cxpos == answer1.x - 65 || muncher.cxpos == answer1.x - 1) && (muncher.cypos == answer1.y + 63 || muncher.cypos == answer1.y - 65 || muncher.cypos == answer1.y - 1) ) {
+            //finds a new position for answer 1 if it is adjacent to muncher 
+            while( adjacencyMuncherAnswer1() ){
                 randomPos(answer1);
                 convertMovesToPixels(answer1);
             }
-            //finds a new position for answer 2 if it is adjacent to answer 1 
-            while( (answer1.x == answer2.x || answer1.x == answer2.x + 64 || answer1.x == answer2.x - 64) && (answer1.y == answer2.y || answer1.y == answer2.y + 64 || answer1.y == answer2.y - 64) || 
-                   (muncher.cxpos == answer2.x + 63 || muncher.cxpos == answer2.x - 65 || muncher.cxpos == answer2.x - 1) && (muncher.cypos == answer2.y + 63 || muncher.cypos == answer2.y - 65 || muncher.cypos == answer2.y - 1) ) {
+            //finds a new position for answer 2 if it is adjacent to answer 1 or muncher 
+            while( adjacencyMuncherAnswer12() ){
                randomPos(answer2);
                convertMovesToPixels(answer2);
             }
-            //finds a new position for answer 3 if it is adjacent to answer 1 or 2
-            while( (answer1.x == answer3.x || answer1.x == answer3.x + 64 || answer1.x == answer3.x - 64) && (answer1.y == answer3.y || answer1.y == answer3.y + 64 || answer1.y == answer3.y - 64) ||
-                   (answer2.x == answer3.x || answer2.x == answer3.x + 64 || answer2.x == answer3.x - 64) && (answer2.y == answer3.y || answer2.y == answer3.y + 64 || answer2.y == answer3.y - 64) || 
-                   (muncher.cxpos == answer3.x + 63 || muncher.cxpos == answer3.x - 65 || muncher.cxpos == answer3.x - 1) && (muncher.cypos == answer3.y + 63 || muncher.cypos == answer3.y - 65 || muncher.cypos == answer3.y - 1) ){
+            //finds a new position for answer 3 if it is adjacent to answer 1 or 2 or muncher
+            while( adjacencyMuncherAnswer123() ){
                 randomPos(answer3);
                 convertMovesToPixels(answer3);
             }
-            //finds a new position for answer 4 if it is adjacent to answer 1 or 2 or 3
-            while( (answer1.x == answer4.x || answer1.x == answer4.x + 64 || answer1.x == answer4.x - 64) && (answer1.y == answer4.y || answer1.y == answer4.y + 64 || answer1.y == answer4.y - 64) ||
-                   (answer2.x == answer4.x || answer2.x == answer4.x + 64 || answer2.x == answer4.x - 64) && (answer2.y == answer4.y || answer2.y == answer4.y + 64 || answer2.y == answer4.y - 64) ||
-                   (answer3.x == answer4.x || answer3.x == answer4.x + 64 || answer3.x == answer4.x - 64) && (answer3.y == answer4.y || answer3.y == answer4.y + 64 || answer3.y == answer4.y - 64) || 
-                   (muncher.cxpos == answer4.x + 63 || muncher.cxpos == answer4.x - 65 || muncher.cxpos == answer4.x - 1) && (muncher.cypos == answer4.y + 63 || muncher.cypos == answer4.y - 65 || muncher.cypos == answer4.y - 1) ){
+            //finds a new position for answer 4 if it is adjacent to answer 1 or 2 or 3 or muncher
+            while( adjacencyMuncherAnswer1234() ){
                 randomPos(answer4);
                 convertMovesToPixels(answer4);
             }
         }
+
+        function adjacencyMuncherAnswer1(){
+            return (muncher.cxpos == answer1.x + pixels.sixthree || muncher.cxpos == answer1.x - pixels.sixfive || muncher.cxpos == answer1.x - 1) && (muncher.cypos == answer1.y + pixels.sixthree || muncher.cypos == answer1.y - pixels.sixfive || muncher.cypos == answer1.y - 1);
+        }
+        function adjacencyMuncherAnswer12(){
+            return (answer1.x == answer2.x || answer1.x == answer2.x + pixels.sixfour || answer1.x == answer2.x - pixels.sixfour) && (answer1.y == answer2.y || answer1.y == answer2.y + pixels.sixfour || answer1.y == answer2.y - pixels.sixfour) || 
+                   (muncher.cxpos == answer2.x + pixels.sixthree || muncher.cxpos == answer2.x - pixels.sixfive || muncher.cxpos == answer2.x - 1) && (muncher.cypos == answer2.y + pixels.sixthree || muncher.cypos == answer2.y - pixels.sixfive || muncher.cypos == answer2.y - 1);
+        }
+        function adjacencyMuncherAnswer123(){
+            return (answer1.x == answer3.x || answer1.x == answer3.x + pixels.sixfour || answer1.x == answer3.x - pixels.sixfour) && (answer1.y == answer3.y || answer1.y == answer3.y + pixels.sixfour || answer1.y == answer3.y - pixels.sixfour) ||
+                   (answer2.x == answer3.x || answer2.x == answer3.x + pixels.sixfour || answer2.x == answer3.x - pixels.sixfour) && (answer2.y == answer3.y || answer2.y == answer3.y + pixels.sixfour || answer2.y == answer3.y - pixels.sixfour) || 
+                   (muncher.cxpos == answer3.x + pixels.sixthree || muncher.cxpos == answer3.x - pixels.sixfive || muncher.cxpos == answer3.x - 1) && (muncher.cypos == answer3.y + pixels.sixthree || muncher.cypos == answer3.y - pixels.sixfive || muncher.cypos == answer3.y - 1);
+        }
+        function adjacencyMuncherAnswer1234(){
+            return (answer1.x == answer4.x || answer1.x == answer4.x + pixels.sixfour || answer1.x == answer4.x - pixels.sixfour) && (answer1.y == answer4.y || answer1.y == answer4.y + pixels.sixfour || answer1.y == answer4.y - pixels.sixfour) ||
+                   (answer2.x == answer4.x || answer2.x == answer4.x + pixels.sixfour || answer2.x == answer4.x - pixels.sixfour) && (answer2.y == answer4.y || answer2.y == answer4.y + pixels.sixfour || answer2.y == answer4.y - pixels.sixfour) ||
+                   (answer3.x == answer4.x || answer3.x == answer4.x + pixels.sixfour || answer3.x == answer4.x - pixels.sixfour) && (answer3.y == answer4.y || answer3.y == answer4.y + pixels.sixfour || answer3.y == answer4.y - pixels.sixfour) || 
+                   (muncher.cxpos == answer4.x + pixels.sixthree || muncher.cxpos == answer4.x - pixels.sixfive || muncher.cxpos == answer4.x - 1) && (muncher.cypos == answer4.y + pixels.sixthree || muncher.cypos == answer4.y - pixels.sixfive || muncher.cypos == answer4.y - 1);
+        }
+
+
         var twoAnswers = document.getElementById('twoAnswers');
         var threeAnswers = document.getElementById('threeAnswers');
         var fourAnswers = document.getElementById('fourAnswers');
@@ -528,7 +545,7 @@ function begin(){
         var fast = document.getElementById('gameSpeed3');
 
         // Create gradient
-        var grd = context.createLinearGradient(0,0,960,0);
+        var grd = context.createLinearGradient(0,0,pixels.boardWidth,0);
         grd.addColorStop(0,"green");
         grd.addColorStop(1,"white");
 
@@ -577,7 +594,7 @@ function begin(){
 
             // Fill with gradient
             context.fillStyle=grd;
-            context.fillRect(0,0,960,63);
+            context.fillRect(0,0,pixels.boardWidth,pixels.sixthree);
 
             muncher.prevx = muncher.cxpos;
             muncher.prevy = muncher.cypos;
@@ -585,30 +602,30 @@ function begin(){
             enemy.prevy = enemy.cypos;
     
     		if(muncher.direction == "left"){
-    			muncher.cxpos -= 64;
-				if(muncher.xpos == 64 && muncher.ypos == 64)
-    				muncher.xpos = 128;
+    			muncher.cxpos -= pixels.sixfour;
+				if(muncher.xpos == pixels.sixfour && muncher.ypos == pixels.sixfour)
+    				muncher.xpos = pixels.onetwoeight;
     			else
-    				muncher.xpos = 64;
+    				muncher.xpos = pixels.sixfour;
     		}
     		else if(muncher.direction == "right"){
-    			muncher.cxpos += 64;
+    			muncher.cxpos += pixels.sixfour;
     			if(muncher.xpos == 0 && muncher.ypos == 0)
-    				muncher.xpos = 128;
+    				muncher.xpos = pixels.onetwoeight;
     			else
     				muncher.xpos = 0;
     		}
     		else if(muncher.direction == "up"){
-    			muncher.cypos -= 64;
-    			if(muncher.xpos == 0 && muncher.ypos == 192)
-    				muncher.xpos = 128;
+    			muncher.cypos -= pixels.sixfour;
+    			if(muncher.xpos == 0 && muncher.ypos == pixels.oneninetwo)
+    				muncher.xpos = pixels.onetwoeight;
     			else
     				muncher.xpos = 0;
     		}
     		else{
-    			muncher.cypos += 64;
-    			if(muncher.xpos == 0 && muncher.ypos == 128)
-    				muncher.xpos = 128;
+    			muncher.cypos += pixels.sixfour;
+    			if(muncher.xpos == 0 && muncher.ypos == pixels.onetwoeight)
+    				muncher.xpos = pixels.onetwoeight;
     			else
     				muncher.xpos = 0;
     		}
@@ -618,24 +635,24 @@ function begin(){
                     enemy.direction = "left";
                     if(enemy.prevDirection == enemy.direction){
                         if(enemy.xpos == 0){
-                            enemy.xpos = 64;
-                            enemy.ypos = 64;
+                            enemy.xpos = pixels.sixfour;
+                            enemy.ypos = pixels.sixfour;
                         }
                         else{
                             enemy.xpos = 0;
-                            enemy.ypos = 64;
+                            enemy.ypos = pixels.sixfour;
                         }
                     }
                     else{
                         enemy.xpos = 0;
-                        enemy.ypos = 64;
+                        enemy.ypos = pixels.sixfour;
                     }
                 }
                 else if(dir == "right"){
                     enemy.direction = "right";
                     if(enemy.prevDirection == enemy.direction){
                         if(enemy.xpos == 0){
-                            enemy.xpos = 64;
+                            enemy.xpos = pixels.sixfour;
                             enemy.ypos = 0;
                         }
                         else{
@@ -652,34 +669,34 @@ function begin(){
                     enemy.direction = "up";
                     if(enemy.prevDirection == enemy.direction){
                         if(enemy.xpos == 0){
-                            enemy.xpos = 64;
-                            enemy.ypos = 128;
+                            enemy.xpos = pixels.sixfour;
+                            enemy.ypos = pixels.onetwoeight;
                         }
                         else{
                             enemy.xpos = 0;
-                            enemy.ypos = 128;
+                            enemy.ypos = pixels.onetwoeight;
                         }
                     }
                     else{
                         enemy.xpos = 0;
-                        enemy.ypos = 128;
+                        enemy.ypos = pixels.onetwoeight;
                     }
                 }
                 else{
                     enemy.direction = "down";
                     if(enemy.prevDirection == enemy.direction){
                         if(enemy.xpos == 0){
-                            enemy.xpos = 64;
-                            enemy.ypos = 192;
+                            enemy.xpos = pixels.sixfour;
+                            enemy.ypos = pixels.oneninetwo;
                         }
                         else{
                             enemy.xpos = 0;
-                            enemy.ypos = 192;
+                            enemy.ypos = pixels.oneninetwo;
                         }
                     }
                     else{
                         enemy.xpos = 0;
-                        enemy.ypos = 192;
+                        enemy.ypos = pixels.oneninetwo;
                     }
                 }
             }
@@ -702,19 +719,19 @@ function begin(){
                     chaseOn = true;
                 if(chaseOn == true){
                     if(muncher.cypos < enemy.cypos){
-                        enemy.cypos -= 64;
+                        enemy.cypos -= pixels.sixfour;
                         currentDirection("up");
                     }
                     else if(muncher.cypos > enemy.cypos){
-                        enemy.cypos += 64;
+                        enemy.cypos += pixels.sixfour;
                         currentDirection("down");
                     }
                     else if(muncher.cxpos > enemy.cxpos){
-                        enemy.cxpos += 64;
+                        enemy.cxpos += pixels.sixfour;
                         currentDirection("right");
                     }
                     else if(muncher.cxpos < enemy.cxpos){
-                        enemy.cxpos -= 64;
+                        enemy.cxpos -= pixels.sixfour;
                         currentDirection("left");
                     }
                     --chase;
@@ -724,60 +741,60 @@ function begin(){
                 else{
                     if(chase < 10)
                         ++chase;
-                    if(enemy.direction == "right" && enemy.cxpos == 896 && enemy.cypos == 64){
+                    if(enemy.direction == "right" && enemy.cxpos == 896 && enemy.cypos == pixels.sixfour){
                         enemy.direction = "down";
-                        enemy.cypos += 64;
+                        enemy.cypos += pixels.sixfour;
                         currentDirection("down");
                     }
                     else if(enemy.direction == "right" && enemy.cxpos < 896){
-                        enemy.cxpos += 64;
+                        enemy.cxpos += pixels.sixfour;
                         currentDirection("right");
                     }
                     else if(enemy.direction == "right" && enemy.cxpos == 896){
                         enemy.direction = "up";
-                        enemy.cypos -= 64;
+                        enemy.cypos -= pixels.sixfour;
                         currentDirection("up");
                     }
-                    else if(enemy.direction == "up" && enemy.cxpos == 0 && enemy.cypos == 64){
+                    else if(enemy.direction == "up" && enemy.cxpos == 0 && enemy.cypos == pixels.sixfour){
                         enemy.direction = "right";
-                        enemy.cxpos += 64;
+                        enemy.cxpos += pixels.sixfour;
                         currentDirection("right");
                     }
-                    else if(enemy.direction == "up" && enemy.cypos > 64){
-                        enemy.cypos -= 64;
+                    else if(enemy.direction == "up" && enemy.cypos > pixels.sixfour){
+                        enemy.cypos -= pixels.sixfour;
                         currentDirection("up");
                     }
-                    else if(enemy.direction == "up" && enemy.cypos == 64){
+                    else if(enemy.direction == "up" && enemy.cypos == pixels.sixfour){
                         enemy.direction = "left";
-                        enemy.cxpos -= 64;
+                        enemy.cxpos -= pixels.sixfour;
                         currentDirection("left");
                     }
                     else if(enemy.direction == "left" && enemy.cxpos == 0 && enemy.cypos == 704){
                         enemy.direction = "up";
-                        enemy.cypos -= 64;
+                        enemy.cypos -= pixels.sixfour;
                         currentDirection("up");
                     }
                     else if(enemy.direction == "left" && enemy.cxpos > 0){
-                        enemy.cxpos -= 64;
+                        enemy.cxpos -= pixels.sixfour;
                         currentDirection("left");
                     }
                     else if(enemy.direction == "left" && enemy.cxpos == 0){
                         enemy.direction = "down";
-                        enemy.cypos += 64;
+                        enemy.cypos += pixels.sixfour;
                         currentDirection("down");
                     }
                     else if(enemy.direction == "down" && enemy.cxpos == 896 && enemy.cypos == 704){
                         enemy.direction = "left";
-                        enemy.cxpos -= 64;
+                        enemy.cxpos -= pixels.sixfour;
                         currentDirection("left");
                     }
                     else if(enemy.direction == "down" && enemy.cypos < 704){
-                        enemy.cypos += 64;
+                        enemy.cypos += pixels.sixfour;
                         currentDirection("down");
                     }
                     else if(enemy.direction == "down" && enemy.cypos == 704){
                         enemy.direction = "right";
-                        enemy.cxpos += 64;
+                        enemy.cxpos += pixels.sixfour;
                         currentDirection("right");
                     }
                 }
@@ -789,8 +806,8 @@ function begin(){
     				case 37:
     				    evt.preventDefault(); //prevents user from scrolling during gameplay
     				    if(muncher.direction != "left"){
-    				    	muncher.xpos = 64;
-    				    	muncher.ypos = 64;
+    				    	muncher.xpos = pixels.sixfour;
+    				    	muncher.ypos = pixels.sixfour;
     				    }
     					muncher.direction = "left";
     					break;
@@ -798,7 +815,7 @@ function begin(){
                         evt.preventDefault();
     					if(muncher.direction != "up"){
     				    	muncher.xpos = 0;
-    				    	muncher.ypos = 192;
+    				    	muncher.ypos = pixels.oneninetwo;
     				    }
     					muncher.direction = "up";
     					break;
@@ -814,7 +831,7 @@ function begin(){
                         evt.preventDefault();
     					if(muncher.direction != "down"){
     				    	muncher.xpos = 0;
-    				    	muncher.ypos = 128;
+    				    	muncher.ypos = pixels.onetwoeight;
     				    }    				
     					muncher.direction = "down";
     					break;
@@ -840,13 +857,13 @@ function begin(){
                 ++score;
 
                 if(muncher.direction == "right")
-                    loadMuncher(64, 0, muncher.cxpos, muncher.cypos);
+                    loadMuncher(pixels.sixfour, 0, muncher.cxpos, muncher.cypos);
                 else if(muncher.direction == "left")
-                    loadMuncher(0, 64, muncher.cxpos, muncher.cypos);
+                    loadMuncher(0, pixels.sixfour, muncher.cxpos, muncher.cypos);
                 else if(muncher.direction == "down")
-                    loadMuncher(64, 128, muncher.cxpos, muncher.cypos);
+                    loadMuncher(pixels.sixfour, pixels.onetwoeight, muncher.cxpos, muncher.cypos);
                 else
-                    loadMuncher(64, 192, muncher.cxpos, muncher.cypos);
+                    loadMuncher(pixels.sixfour, pixels.oneninetwo, muncher.cxpos, muncher.cypos);
                 
                 if(twoAnswers.checked == true){
                     a2 = true;
@@ -872,7 +889,7 @@ function begin(){
             else if(muncher.cxpos == answer2.x -1 && muncher.cypos == answer2.y - 1 || 
                muncher.cxpos == answer3.x -1 && muncher.cypos == answer3.y - 1 || 
                muncher.cxpos == answer4.x -1 && muncher.cypos == answer4.y - 1 || 
-               muncher.cxpos < 0 || muncher.cxpos >= 960 || muncher.cypos >= 768 || muncher.cypos < 64){
+               muncher.cxpos < 0 || muncher.cxpos >= pixels.boardWidth || muncher.cypos >= 768 || muncher.cypos < pixels.sixfour){
             
                 if(score <= 4)
                     document.getElementById('bad').play();
